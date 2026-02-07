@@ -6,6 +6,7 @@ import { ChatInput } from "@/components/chat/ChatInput";
 import { LoadingDots } from "@/components/chat/LoadingDots";
 import { MessageBubble } from "@/components/chat/MessageBubble";
 import { useRef, useEffect } from "react";
+import { useRepo } from "@/components/providers/RepoProvider";
 
 interface ChatDockProps {
   messages: any[];
@@ -15,6 +16,8 @@ interface ChatDockProps {
 
 export function ChatDock({ messages, onSend, isLoading }: ChatDockProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const { repoData } = useRepo();
+  const isLocked = !repoData;
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
@@ -87,8 +90,15 @@ export function ChatDock({ messages, onSend, isLoading }: ChatDockProps) {
       </div>
 
       {/* Input */}
-      <div className="p-4 border-t-2 border-brutal-black bg-white">
-        <ChatInput onSend={onSend} disabled={isLoading} />
+      <div className="p-4 border-t-2 border-brutal-black bg-white relative">
+        {isLocked && (
+          <div className="absolute inset-0 bg-white/80 backdrop-blur-[1px] flex items-center justify-center z-10 p-4">
+             <div className="text-[10px] font-bold text-zinc-400 text-center uppercase tracking-widest leading-tight">
+               🔓 Connect a repository <br/> to unlock AI Command
+             </div>
+          </div>
+        )}
+        <ChatInput onSend={onSend} disabled={isLoading || isLocked} />
       </div>
     </aside>
   );
