@@ -5,7 +5,7 @@ import { repoTree, FileNode } from "@/lib/mock-data";
 import { ComicPanel } from "@/components/ui/ComicPanel";
 
 interface TreeViewProps {
-  filter: "all" | "backend" | "frontend" | "auth" | "database" | "services";
+  filter: string;
   highlightImportant: boolean;
   title: string;
 }
@@ -20,8 +20,11 @@ const moduleFilterMap: Record<string, string[]> = {
 };
 
 function filterTree(node: FileNode, filter: string): FileNode | null {
-  if (filter === "all") return node;
-  const allowedModules = moduleFilterMap[filter] || [];
+  const normalizedFilter = filter.toLowerCase();
+  const activeFilter = moduleFilterMap[normalizedFilter] ? normalizedFilter : "all";
+
+  if (activeFilter === "all") return node;
+  const allowedModules = moduleFilterMap[activeFilter] || [];
 
   if (node.type === "file") {
     if (!node.module) return node;
@@ -31,7 +34,7 @@ function filterTree(node: FileNode, filter: string): FileNode | null {
   if (node.module && !allowedModules.includes(node.module)) return null;
 
   const filteredChildren = node.children
-    ?.map((child) => filterTree(child, filter))
+    ?.map((child) => filterTree(child, activeFilter))
     .filter(Boolean) as FileNode[] | undefined;
 
   if (filteredChildren && filteredChildren.length === 0 && node.name !== repoTree.name) return null;
@@ -47,9 +50,8 @@ function TreeNode({ node, depth, highlightImportant }: { node: FileNode; depth: 
   return (
     <div style={{ marginLeft: depth * 16 }}>
       <div
-        className={`flex items-center gap-2 py-1 px-2 rounded cursor-pointer hover:bg-yellow-50 transition-colors ${
-          isImportant && highlightImportant ? "bg-yellow-50" : ""
-        }`}
+        className={`flex items-center gap-2 py-1 px-2 rounded cursor-pointer hover:bg-yellow-50 transition-colors ${isImportant && highlightImportant ? "bg-yellow-50" : ""
+          }`}
         onClick={() => isFolder && setExpanded(!expanded)}
       >
         <span className="text-base">

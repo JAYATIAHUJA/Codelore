@@ -5,7 +5,7 @@ import { modules } from "@/lib/mock-data";
 import { ComicPanel } from "@/components/ui/ComicPanel";
 
 interface ModuleCardsProps {
-  filter: "all" | "backend" | "frontend" | "auth" | "database" | "services";
+  filter: string;
   title: string;
 }
 
@@ -19,7 +19,9 @@ const filterMap: Record<string, string[]> = {
 };
 
 export function ModuleCards({ filter = "all", title }: ModuleCardsProps) {
-  const visible = modules.filter((m) => filterMap[filter]?.includes(m.name));
+  const normalizedFilter = filter.toLowerCase();
+  const activeFilter = filterMap[normalizedFilter] ? normalizedFilter : "all";
+  const visible = modules.filter((m) => filterMap[activeFilter]?.includes(m.name));
 
   return (
     <ComicPanel title={title} color="#FFD600">
