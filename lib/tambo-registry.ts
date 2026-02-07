@@ -10,15 +10,31 @@ export const componentRegistry: TamboComponent[] = [
   {
     name: "ModuleCards",
     description:
-      "Shows high-level architecture overview of the codebase as module cards. Use when user asks to 'explain this project', 'high level overview', 'what does this codebase do', or 'show me the architecture'. Each card shows a module name, description, key files, and dependencies.",
+      "Shows a high-level architecture overview of the codebase as module cards. Use when the user asks to explain the project, wants a high-level overview, architecture, or what the codebase does.",
     component: ModuleCards,
     propsSchema: z.object({
       filter: z
         .string()
+        .optional()
+        .default("all")
         .describe("Which modules to show. Use 'all' by default. Options: 'all', 'backend', 'frontend', 'auth', 'database', 'services'. If unsure, use 'all'."),
       title: z
         .string()
+        .optional()
+        .default("PROJECT OVERVIEW")
         .describe("A short comic-style title for the section, e.g. 'PROJECT OVERVIEW!' or 'BACKEND MODULES!'"),
+      modules: z
+        .array(
+          z.object({
+            name: z.string().describe("Name of the module, e.g. 'Authentication'"),
+            description: z.string().describe("Brief description of what this module does"),
+            files: z.array(z.string()).describe("List of key files in this module"),
+            dependencies: z.array(z.string()).optional().describe("List of other modules this module depends on"),
+            color: z.string().optional().describe("Hex color code for the module tag"),
+          })
+        )
+        .optional()
+        .describe("The list of modules to display. Generate this based on the repository code."),
     }),
   },
   {
@@ -29,12 +45,18 @@ export const componentRegistry: TamboComponent[] = [
     propsSchema: z.object({
       filter: z
         .string()
+        .optional()
+        .default("all")
         .describe("Which part of the tree to show. 'all' shows everything. Options: 'backend', 'frontend', 'auth'. Default to 'all'."),
       highlightImportant: z
         .boolean()
+        .optional()
+        .default(true)
         .describe("If true, highlight important files with a star icon."),
       title: z
         .string()
+        .optional()
+        .default("FOLDER STRUCTURE")
         .describe("A short comic-style title, e.g. 'FOLDER STRUCTURE!' or 'BACKEND FILES!'"),
     }),
   },
@@ -46,35 +68,52 @@ export const componentRegistry: TamboComponent[] = [
     propsSchema: z.object({
       title: z
         .string()
+        .optional()
+        .default("AUTH FLOW")
         .describe("A comic-style title, e.g. 'AUTH FLOW!' or 'LOGIN SEQUENCE!'"),
     }),
   },
   {
     name: "FileSummary",
     description:
-      "Shows detailed information about a specific file — its role, importance, and what it does. Use when user asks about a specific file like 'what does login.ts do' or 'explain authMiddleware'.",
+      "Explains a specific file in the codebase — its purpose, role, and importance. Use when the user asks about a specific file.",
     component: FileSummary,
     propsSchema: z.object({
       filename: z
         .string()
-        .describe("The filename to explain, e.g. 'login.ts', 'authMiddleware.ts', 'routes.ts', 'prismaClient.ts', 'Dashboard.tsx', 'tokenService.ts'"),
+        .optional()
+        .describe(
+          "The filename to explain, e.g. 'login.ts', 'authMiddleware.ts', 'routes.ts'."
+        ),
       title: z
         .string()
-        .describe("A comic-style title, e.g. 'FILE BREAKDOWN!' or 'INSIDE login.ts!'"),
+        .optional()
+        .default("FILE BREAKDOWN!")
+        .describe(
+          "A comic-style title, e.g. 'FILE BREAKDOWN!' or 'INSIDE login.ts!'"
+        ),
     }),
   },
   {
     name: "GuidanceCard",
     description:
-      "Shows a helpful guidance message or suggestion. Use as a fallback when the query doesn't match other components, or to provide tips. Also use for greetings.",
+      "Shows a helpful guidance or suggestion message. Use when the user greets the system, asks an unclear question, or when no other component applies.",
     component: GuidanceCard,
     propsSchema: z.object({
       message: z
         .string()
-        .describe("The guidance message to display"),
+        .optional()
+        .default("Try asking about the project architecture, folder structure, or auth flow.")
+        .describe("The guidance message to display."),
       suggestions: z
         .array(z.string())
-        .describe("Suggested follow-up queries the user can try, e.g. ['Explain this project', 'Show folder structure', 'Auth flow']"),
+        .optional()
+        .default([
+          "Explain this project",
+          "Show folder structure",
+          "Show auth flow",
+        ])
+        .describe("Suggested follow-up queries."),
     }),
   },
 ];

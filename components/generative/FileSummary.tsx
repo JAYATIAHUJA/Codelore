@@ -9,8 +9,9 @@ interface FileSummaryProps {
   title?: string;
 }
 
-export function FileSummary({ filename = "unknown.ts", title = "FILE DETAILS" }: FileSummaryProps) {
-  const info = fileSummaries[filename];
+export function FileSummary({ filename, title = "FILE DETAILS" }: FileSummaryProps) {
+  const safeFilename = filename || "unknown.ts";
+  const info = fileSummaries[safeFilename];
 
   if (!info) {
     return (
@@ -37,8 +38,8 @@ export function FileSummary({ filename = "unknown.ts", title = "FILE DETAILS" }:
           <span className="text-xs font-bold uppercase text-zinc-500">Importance:</span>
           <span
             className={`inline-block rounded-full px-3 py-0.5 text-xs font-bold border-2 border-black ${info.importance === "Critical"
-                ? "bg-red-100 text-red-800"
-                : "bg-yellow-100 text-yellow-800"
+              ? "bg-red-100 text-red-800"
+              : "bg-yellow-100 text-yellow-800"
               }`}
           >
             {info.importance}

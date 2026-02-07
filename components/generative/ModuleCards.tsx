@@ -4,13 +4,22 @@ import React from "react";
 import { modules } from "@/lib/mock-data";
 import { ComicPanel } from "@/components/ui/ComicPanel";
 
+interface Module {
+  name: string;
+  description: string;
+  files: string[];
+  dependencies?: string[];
+  color?: string;
+}
+
 interface ModuleCardsProps {
   filter?: string;
   title?: string;
+  modules?: Module[];
 }
 
 const filterMap: Record<string, string[]> = {
-  all: ["Authentication", "Backend API", "Services", "Database", "Frontend"],
+  all: [], // If all, we show everything. Logic below handles this.
   backend: ["Backend API", "Services", "Database"],
   frontend: ["Frontend"],
   auth: ["Authentication"],
@@ -18,10 +27,24 @@ const filterMap: Record<string, string[]> = {
   services: ["Services"],
 };
 
-export function ModuleCards({ filter = "all", title = "PROJECT OVERVIEW" }: ModuleCardsProps) {
+export function ModuleCards({ filter = "all", title = "PROJECT OVERVIEW", modules: aiModules }: ModuleCardsProps) {
+  // Use AI provided modules if available, otherwise fallback to mock (or empty)
+  const data = aiModules || modules;
+
   const normalizedFilter = filter.toLowerCase();
-  const activeFilter = filterMap[normalizedFilter] ? normalizedFilter : "all";
-  const visible = modules.filter((m) => filterMap[activeFilter]?.includes(m.name));
+
+  // If filter is specific and we have mock data map, use it. 
+  // But for AI data, we might need a generic filter.
+  // For now, if AI provides data, we just show all of it unless filter logic is generic.
+  // Let's implement a simple generic filter if possible, or just show all for AI data as it's likely pre-filtered by generic prompt or just small enough.
+
+  const visible = aiModules
+    ? aiModules
+    : modules.filter((m) => {
+      const activeFilter = filterMap[normalizedFilter] ? normalizedFilter : "all";
+      if (activeFilter === "all") return true;
+      return filterMap[activeFilter]?.includes(m.name);
+    });
 
   return (
     <ComicPanel title={title} color="#FFD600">
@@ -55,7 +78,7 @@ export function ModuleCards({ filter = "all", title = "PROJECT OVERVIEW" }: Modu
                 )}
               </div>
             </div>
-            {mod.dependencies.length > 0 && (
+            {mod.dependencies && mod.dependencies.length > 0 && (
               <div>
                 <span className="text-xs font-bold uppercase text-zinc-500">Depends on:</span>
                 <div className="flex flex-wrap gap-1 mt-1">

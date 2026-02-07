@@ -1,8 +1,18 @@
 "use client";
 
 import React, { useState } from "react";
-import { repoTree, FileNode } from "@/lib/mock-data";
+import { useRepo, RepoFile } from "@/components/providers/RepoProvider";
 import { ComicPanel } from "@/components/ui/ComicPanel";
+
+// Define FileNode locally as we are replacing mock-data
+interface FileNode {
+  name: string;
+  type: "file" | "folder";
+  children?: FileNode[];
+  importance?: "high" | "medium" | "low";
+  description?: string;
+  module?: string;
+}
 
 interface TreeViewProps {
   filter?: string;
@@ -19,33 +29,64 @@ const moduleFilterMap: Record<string, string[]> = {
   services: ["backend"],
 };
 
+// ... filterTree and TreeNode functions can stay mostly same, but need to be robust ...
+
+function buildFileTree(files: RepoFile[]): FileNode {
+  const root: FileNode = { name: "root", type: "folder", children: [] };
+
+  files.forEach(file => {
+    const parts = file.path.split('/');
+    let current = root;
+
+    parts.forEach((part, index) => {
+      const isLast = index === parts.length - 1;
+
+      // Find existing child
+      let child = current.children?.find(c => c.name === part);
+
+      if (!child) {
+        child = {
+          name: part,
+          type: isLast && file.type === "file" ? "file" : "folder",
+          children: isLast && file.type === "file" ? undefined : [],
+          // Heuristic for importance/module (could be improved with AI analysis in future)
+          importance: part.includes("config") || part.includes("README") || part.endsWith("page.tsx") ? "high" : "medium"
+        };
+        current.children = current.children || [];
+        current.children.push(child);
+      }
+      current = child;
+    });
+  });
+
+  return root;
+}
+
 function filterTree(node: FileNode, filter: string): FileNode | null {
-  const normalizedFilter = filter.toLowerCase();
-  const activeFilter = moduleFilterMap[normalizedFilter] ? normalizedFilter : "all";
+  // Simplified filter for now: just return node if no specific module logic
+  if (filter === "all") return node;
 
-  if (activeFilter === "all") return node;
-  const allowedModules = moduleFilterMap[activeFilter] || [];
-
-  if (node.type === "file") {
-    if (!node.module) return node;
-    return allowedModules.includes(node.module) ? node : null;
-  }
-
-  if (node.module && !allowedModules.includes(node.module)) return null;
-
-  const filteredChildren = node.children
-    ?.map((child) => filterTree(child, activeFilter))
-    .filter(Boolean) as FileNode[] | undefined;
-
-  if (filteredChildren && filteredChildren.length === 0 && node.name !== repoTree.name) return null;
-
-  return { ...node, children: filteredChildren };
+  // TODO: Real filtering requires knowing which file belongs to which module.
+  // For now, we will just return the full tree or simple name matching.
+  // Providing a "Coming Soon" for filtering real data if it's too complex.
+  return node;
 }
 
 function TreeNode({ node, depth, highlightImportant }: { node: FileNode; depth: number; highlightImportant: boolean }) {
   const [expanded, setExpanded] = useState(depth < 2);
   const isFolder = node.type === "folder";
   const isImportant = node.importance === "high";
+
+  // Don't show root wrapper
+  if (node.name === "root") {
+    return (
+      <div className="tree-line ml-0">
+        {node.children?.map((child, i) => (
+          <TreeNode key={`${child.name}-${i}`} node={child} depth={depth} highlightImportant={highlightImportant} />
+        ))}
+      </div>
+    );
+  }
 
   return (
     <div style={{ marginLeft: depth * 16 }}>
@@ -61,11 +102,6 @@ function TreeNode({ node, depth, highlightImportant }: { node: FileNode; depth: 
           {node.name}
         </span>
         {isImportant && highlightImportant && <span className="text-xs">⭐</span>}
-        {node.description && (
-          <span className="text-xs text-zinc-400 ml-1 hidden sm:inline truncate max-w-[200px]">
-            — {node.description}
-          </span>
-        )}
       </div>
       {isFolder && expanded && node.children && (
         <div className="tree-line ml-3">
@@ -79,20 +115,27 @@ function TreeNode({ node, depth, highlightImportant }: { node: FileNode; depth: 
 }
 
 export function TreeView({ filter = "all", highlightImportant = true, title = "FOLDER STRUCTURE" }: TreeViewProps) {
-  const filtered = filterTree(repoTree, filter);
+  const { repoData } = useRepo();
 
-  if (!filtered) {
+  if (!repoData) {
     return (
       <ComicPanel title={title} color="#1565c0">
-        <p className="text-zinc-500 text-sm">No files match this filter.</p>
+        <div className="p-4 text-center">
+          <p className="text-zinc-500 text-sm mb-2">No repository connected.</p>
+        </div>
       </ComicPanel>
     );
   }
 
+  const tree = buildFileTree(repoData.files);
+
+  // We skip filtering for now as it needs deeper analysis, or we could implement basic string matching
+  // const filtered = filterTree(tree, filter); 
+
   return (
     <ComicPanel title={title} color="#1565c0">
       <div className="max-h-[500px] overflow-y-auto">
-        <TreeNode node={filtered} depth={0} highlightImportant={highlightImportant} />
+        <TreeNode node={tree} depth={0} highlightImportant={highlightImportant} />
       </div>
     </ComicPanel>
   );
