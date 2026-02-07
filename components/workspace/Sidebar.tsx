@@ -1,13 +1,21 @@
 "use client";
 
-import { useState } from "react";
-import { Folder, FileCode, Beaker, BookOpen, ChevronRight, Star, Layers, Activity } from "lucide-react";
+import { useState, useMemo } from "react";
+import { Folder, FileCode, Beaker, BookOpen, ChevronRight, Star, Layers, Activity, GitBranch, Terminal } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useRepo } from "@/components/providers/RepoProvider";
+import { buildFileTree, TreeNode } from "@/lib/utils";
 
 type Tab = "FILES" | "INSIGHTS" | "DOCS";
 
 export function Sidebar() {
   const [activeTab, setActiveTab] = useState<Tab>("FILES");
+  const { repoData, isLoading: isRepoLoading } = useRepo();
+
+  const fileTree = useMemo(() => {
+    if (!repoData?.files) return [];
+    return buildFileTree(repoData.files);
+  }, [repoData]);
 
   return (
     <aside className="w-72 border-r-2 border-brutal-black bg-white flex flex-col h-[calc(100vh-3.5rem)] sticky top-14">
@@ -38,12 +46,26 @@ export function Sidebar() {
               className="space-y-4"
             >
               <div className="space-y-1">
-                <FileItem level={0} icon={<Folder size={16} />} label="src" isFolder isOpened />
-                <FileItem level={1} icon={<Folder size={16} />} label="auth" isFolder isOpened />
-                <FileItem level={2} icon={<FileCode size={16} />} label="login.ts" isImportant />
-                <FileItem level={2} icon={<FileCode size={16} />} label="register.ts" />
-                <FileItem level={1} icon={<Folder size={16} />} label="api" isFolder />
-                <FileItem level={1} icon={<Folder size={16} />} label="db" isFolder />
+                {isRepoLoading ? (
+                  <div className="py-10 flex flex-col items-center justify-center space-y-3 opacity-50">
+                    <Activity className="animate-spin text-brutal-blue" size={24} />
+                    <span className="text-[10px] font-bold uppercase tracking-widest">Parsing Tree...</span>
+                  </div>
+                ) : fileTree.length > 0 ? (
+                  <div className="pb-4">
+                    <div className="flex items-center gap-2 px-2 py-1 mb-2 bg-zinc-50 border border-zinc-200">
+                       <GitBranch size={12} className="text-zinc-400" />
+                       <span className="text-[10px] font-mono font-bold text-zinc-500">{repoData?.repo.branch || "main"}</span>
+                    </div>
+                    <RecursiveTree nodes={fileTree} level={0} />
+                  </div>
+                ) : (
+                  <div className="py-10 text-center space-y-2 opacity-50 px-4">
+                    <Terminal size={24} className="mx-auto text-zinc-300" />
+                    <p className="text-[10px] font-bold uppercase leading-tight">No Repository Connected</p>
+                    <p className="text-[9px] font-medium lowercase">Connect a public GitHub repo to start navigating.</p>
+                  </div>
+                )}
               </div>
             </motion.div>
           )}
@@ -109,18 +131,66 @@ export function Sidebar() {
   );
 }
 
-function FileItem({ level, label, isFolder, isOpened, isImportant, icon }: { level: number; label: string; isFolder?: boolean; isOpened?: boolean; isImportant?: boolean; icon: React.ReactNode }) {
+function RecursiveTree({ nodes, level }: { nodes: TreeNode[]; level: number }) {
+  return (
+    <>
+      {nodes.map((node) => (
+        <TreeItem key={node.path} node={node} level={level} />
+      ))}
+    </>
+  );
+}
+
+function TreeItem({ node, level }: { node: TreeNode; level: number }) {
+  const [isOpened, setIsOpened] = useState(false);
+  const isSelected = false; // Add selection logic later if needed
+
+  return (
+    <div>
+      <FileItem
+        level={level}
+        label={node.name}
+        isFolder={node.type === "directory"}
+        isOpened={isOpened}
+        icon={node.type === "directory" ? <Folder size={14} className={isOpened ? "fill-zinc-200" : ""} /> : <FileCode size={14} />}
+        onClick={() => node.type === "directory" && setIsOpened(!isOpened)}
+      />
+      {isOpened && node.children && (
+        <RecursiveTree nodes={node.children} level={level + 1} />
+      )}
+    </div>
+  );
+}
+
+function FileItem({ 
+  level, 
+  label, 
+  isFolder, 
+  isOpened, 
+  isImportant, 
+  icon, 
+  onClick 
+}: { 
+  level: number; 
+  label: string; 
+  isFolder?: boolean; 
+  isOpened?: boolean; 
+  isImportant?: boolean; 
+  icon: React.ReactNode;
+  onClick?: () => void;
+}) {
   return (
     <div 
-      style={{ paddingLeft: `${level * 12}px` }}
-      className={`group flex items-center gap-2 py-1 px-2 cursor-pointer hover:bg-zinc-50 transition-colors ${isImportant ? "text-brutal-blue" : "text-zinc-600"}`}
+      style={{ paddingLeft: `${level * 12 + 8}px` }}
+      onClick={onClick}
+      className={`group flex items-center gap-2 py-1 px-2 cursor-pointer hover:bg-zinc-50 transition-colors ${isImportant ? "text-brutal-blue" : "text-zinc-600"} active:bg-zinc-100`}
     >
       <div className="flex items-center justify-center w-4">
-        {isFolder && <ChevronRight size={14} className={`transition-transform ${isOpened ? "rotate-90" : ""}`} />}
+        {isFolder && <ChevronRight size={10} className={`transition-transform duration-200 ${isOpened ? "rotate-90" : ""}`} />}
       </div>
       <span className="text-zinc-400 group-hover:text-brutal-black transition-colors">{icon}</span>
-      <span className={`text-xs font-mono font-medium ${isImportant ? "font-bold" : ""}`}>{label}</span>
-      {isImportant && <Star size={10} fill="currentColor" className="ml-auto" />}
+      <span className={`text-[11px] font-mono truncate ${isImportant ? "font-bold" : "font-medium"}`}>{label}</span>
+      {isImportant && <Star size={10} fill="currentColor" className="ml-auto flex-shrink-0" />}
     </div>
   );
 }

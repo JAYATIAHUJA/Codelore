@@ -1,9 +1,12 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Github, Search, Share, Settings, ChevronDown, Command } from "lucide-react";
+import { Github, Search, Share, Settings, ChevronDown, Command, Unplug } from "lucide-react";
+import { useRepo } from "@/components/providers/RepoProvider";
 
 export function TopNavbar() {
+  const { repoData, setRepoData } = useRepo();
+
   return (
     <nav className="h-14 border-b-2 border-brutal-black bg-white flex items-center justify-between px-4 z-50 sticky top-0">
       {/* Left: Branding & Repo */}
@@ -17,16 +20,29 @@ export function TopNavbar() {
 
         <div className="h-6 w-[2px] bg-zinc-200" />
 
-        <div className="flex items-center gap-3 group cursor-pointer hover:bg-zinc-50 px-2 py-1 rounded transition-colors">
-          <Github size={18} className="text-zinc-600" />
-          <div className="flex flex-col">
-            <span className="text-[10px] uppercase font-bold text-zinc-400 leading-none">Repository</span>
-            <div className="flex items-center gap-1">
-               <span className="text-sm font-bold font-mono">acme-corp / phoenix-web</span>
-               <ChevronDown size={14} className="text-zinc-400" />
+        {repoData ? (
+          <div className="flex items-center gap-3 group px-2 py-1 rounded transition-colors animate-in slide-in-from-left-2">
+            <Github size={18} className="text-brutal-blue" />
+            <div className="flex flex-col">
+              <span className="text-[10px] uppercase font-bold text-zinc-400 leading-none">Repository</span>
+              <div className="flex items-center gap-1">
+                 <span className="text-sm font-bold font-mono">{repoData.repo.owner} / {repoData.repo.name}</span>
+                 <button 
+                  onClick={() => setRepoData(null)}
+                  className="p-1 hover:bg-red-50 hover:text-brutal-red rounded transition-colors"
+                  title="Disconnect Repository"
+                 >
+                    <Unplug size={12} />
+                 </button>
+              </div>
             </div>
           </div>
-        </div>
+        ) : (
+          <div className="flex items-center gap-2 px-3 py-1 bg-zinc-50 border border-zinc-200 rounded">
+             <div className="w-2 h-2 rounded-full bg-zinc-300 animate-pulse" />
+             <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">No Active Repo</span>
+          </div>
+        )}
       </div>
 
       {/* Center: Command Bar */}
@@ -43,14 +59,25 @@ export function TopNavbar() {
 
       {/* Right: Actions */}
       <div className="flex items-center gap-3">
-        <button className="brutal-btn-cyan h-9 px-4 text-xs font-bold uppercase flex items-center gap-2">
-          Connect GitHub
-        </button>
+        {!repoData && (
+          <button 
+            onClick={() => document.querySelector("input")?.focus()}
+            className="brutal-btn-cyan h-9 px-4 text-xs font-bold uppercase flex items-center gap-2"
+          >
+            Connect GitHub
+          </button>
+        )}
         <div className="flex items-center gap-2">
-          <button className="w-9 h-9 border-2 border-black flex items-center justify-center hover:bg-zinc-50 transition-all rounded shadow-[2px_2px_0px_black] active:shadow-none active:translate-x-[2px] active:translate-y-[2px]">
+          <button 
+            title="Share Workspace"
+            className="w-9 h-9 border-2 border-black flex items-center justify-center hover:bg-zinc-50 transition-all rounded shadow-[2px_2px_0px_black] active:shadow-none active:translate-x-[2px] active:translate-y-[2px]"
+          >
             <Share size={16} />
           </button>
-          <button className="w-9 h-9 border-2 border-black flex items-center justify-center hover:bg-zinc-50 transition-all rounded shadow-[2px_2px_0px_black] active:shadow-none active:translate-x-[2px] active:translate-y-[2px]">
+          <button 
+            title="Settings"
+            className="w-9 h-9 border-2 border-black flex items-center justify-center hover:bg-zinc-50 transition-all rounded shadow-[2px_2px_0px_black] active:shadow-none active:translate-x-[2px] active:translate-y-[2px]"
+          >
             <Settings size={16} />
           </button>
         </div>

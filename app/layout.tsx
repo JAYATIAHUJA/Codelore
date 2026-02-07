@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Comic_Neue, Bangers } from "next/font/google";
 import "./globals.css";
 import { TamboProviderWrapper } from "@/components/providers/TamboProviderWrapper";
+import { RepoProvider } from "@/components/providers/RepoProvider";
 
 const comicNeue = Comic_Neue({
   subsets: ["latin"],
@@ -30,7 +31,9 @@ export default function RootLayout({
       <body
         className={`${comicNeue.variable} ${bangers.variable} font-[var(--font-comic-neue)] antialiased`}
       >
-        <TamboProviderWrapper>{children}</TamboProviderWrapper>
+        <RepoProvider>
+          <TamboProviderWrapper>{children}</TamboProviderWrapper>
+        </RepoProvider>
       </body>
     </html>
   );
