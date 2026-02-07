@@ -14,8 +14,8 @@ export const componentRegistry: TamboComponent[] = [
     component: ModuleCards,
     propsSchema: z.object({
       filter: z
-        .enum(["all", "backend", "frontend", "auth", "database", "services"])
-        .describe("Which modules to show. Use 'all' by default. Use 'backend' if user says focus on backend. Use 'auth' for auth-related queries."),
+        .string()
+        .describe("Which modules to show. Use 'all' by default. Options: 'all', 'backend', 'frontend', 'auth', 'database', 'services'. If unsure, use 'all'."),
       title: z
         .string()
         .describe("A short comic-style title for the section, e.g. 'PROJECT OVERVIEW!' or 'BACKEND MODULES!'"),
@@ -28,8 +28,8 @@ export const componentRegistry: TamboComponent[] = [
     component: TreeView,
     propsSchema: z.object({
       filter: z
-        .enum(["all", "backend", "frontend", "auth", "database", "services"])
-        .describe("Which part of the tree to show. 'all' shows everything. 'backend' shows only backend folders. 'auth' shows only auth files."),
+        .string()
+        .describe("Which part of the tree to show. 'all' shows everything. Options: 'backend', 'frontend', 'auth'. Default to 'all'."),
       highlightImportant: z
         .boolean()
         .describe("If true, highlight important files with a star icon."),
