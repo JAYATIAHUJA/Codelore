@@ -1,113 +1,88 @@
 "use client";
 
-import React, { useRef, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useTamboThread } from "@tambo-ai/react";
-import { ChatInput } from "@/components/chat/ChatInput";
-import { MessageBubble } from "@/components/chat/MessageBubble";
-import { LoadingDots } from "@/components/chat/LoadingDots";
+import { TopNavbar } from "@/components/workspace/TopNavbar";
+import { Sidebar } from "@/components/workspace/Sidebar";
+import { ChatDock } from "@/components/workspace/ChatDock";
+import { Canvas, CanvasNode } from "@/components/workspace/Canvas";
 
-const WELCOME_SUGGESTIONS = [
-  "Explain this project",
-  "Show folder structure",
-  "Focus on backend",
-  "Only auth flow",
-  "What does login.ts do?",
-];
+interface WorkspaceNode {
+  id: string;
+  component: React.ReactNode;
+  x: number;
+  y: number;
+}
 
-export default function Interface() {
+export default function WorkspaceInterface() {
   const { thread, sendThreadMessage, isIdle } = useTamboThread();
-  const isLoading = !isIdle;
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const [nodes, setNodes] = useState<WorkspaceNode[]>([]);
+  const [nodeCount, setNodeCount] = useState(0);
 
+  const isLoading = !isIdle;
+  const messages = thread?.messages ?? [];
+
+  // Watch for new rendered components to add to canvas
   useEffect(() => {
-    scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
-  }, [thread?.messages, isLoading]);
+    const lastMessage = messages[messages.length - 1];
+    if (lastMessage?.role === "assistant" && lastMessage.renderedComponent) {
+      // Check if this component is already added (by message ID)
+      setNodes(prev => {
+        const id = lastMessage.id;
+        if (prev.some(n => n.id === id)) return prev;
+        
+        // Arrange new nodes in a slight cascade or grid
+        const spacing = 480;
+        const x = (nodeCount % 3) * spacing + 100;
+        const y = Math.floor(nodeCount / 3) * spacing + 20;
+        
+        setNodeCount(c => c + 1);
+        return [...prev, { id, component: lastMessage.renderedComponent, x, y }];
+      });
+    }
+  }, [messages, nodeCount]);
 
   const handleSend = async (text: string) => {
     try {
       await sendThreadMessage(text);
     } catch (error) {
       console.error("Failed to send message:", error);
-      if (typeof error === 'object' && error !== null) {
-        console.error("Error details:", JSON.stringify(error, null, 2));
-      }
-      alert("Failed to send message to AI. Please check the console for details.");
     }
   };
 
-  const messages = thread?.messages ?? [];
-
   return (
-    <div className="flex min-h-screen flex-col bg-[var(--color-comic-white)]">
-      {/* Header */}
-      <header className="sticky top-0 z-50 border-b-4 border-black bg-[#FFD600] px-4 py-3">
-        <div className="mx-auto flex max-w-4xl items-center justify-between">
-          <div className="flex items-center gap-3">
-            <span className="text-3xl">🗺️</span>
-            <h1 className="font-[var(--font-bangers)] text-2xl tracking-wider uppercase">
-              CODELORE INTERFACE
-            </h1>
-          </div>
-          <span className="comic-border rounded-full bg-white px-3 py-1 text-xs font-bold">
-            GENERATIVE UI
-          </span>
-        </div>
-      </header>
+    <div className="flex flex-col h-screen overflow-hidden bg-white text-brutal-black selection:bg-brutal-blue selection:text-white">
+      <TopNavbar />
+      
+      <main className="flex flex-1 overflow-hidden relative">
+        <Sidebar />
+        
+        <Canvas>
+           {/* Welcome Hint on Canvas */}
+           {nodes.length === 0 && (
+             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center space-y-4 opacity-20 pointer-events-none">
+                <div className="text-9xl grayscale">🌌</div>
+                <h2 className="text-4xl font-[var(--font-bangers)] uppercase tracking-widest italic">Canvas Ready</h2>
+                <p className="font-mono text-sm max-w-xs uppercase font-bold">Chat with the repo to manifest architecture nodes here.</p>
+             </div>
+           )}
 
-      {/* Messages Area */}
-      <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-6">
-        <div className="mx-auto max-w-4xl space-y-4">
-          {messages.length === 0 && (
-            <div className="flex flex-col items-center justify-center py-16 text-center comic-enter">
-              <span className="text-6xl mb-4">💬</span>
-              <h2 className="font-[var(--font-bangers)] text-3xl tracking-wider mb-2 uppercase">
-                TALK TO YOUR CODEBASE!
-              </h2>
-              <p className="text-zinc-600 text-base mb-6 max-w-md font-medium">
-                Ask anything about the project. The UI will transform based on what you want to understand.
-              </p>
-              <div className="flex flex-wrap justify-center gap-2">
-                {WELCOME_SUGGESTIONS.map((s) => (
-                  <button
-                    key={s}
-                    onClick={() => handleSend(s)}
-                    className="comic-border rounded-full bg-white px-4 py-2 text-sm font-semibold hover:bg-yellow-50 active:scale-95 transition-all"
-                  >
-                    &ldquo;{s}&rdquo;
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {messages.map((msg) => (
-            <React.Fragment key={msg.id}>
-              {msg.role === "user" && msg.content && (
-                <MessageBubble role="user" content={msg.content} />
-              )}
-
-              {msg.role === "assistant" && msg.content && (
-                <MessageBubble role="assistant" content={msg.content} />
-              )}
-
-              {msg.role === "assistant" && msg.renderedComponent && (
-                <div className="comic-enter">
-                  {msg.renderedComponent}
+           {/* AI Manifested Nodes */}
+           {nodes.map((node) => (
+             <CanvasNode key={node.id} id={node.id} initialX={node.x} initialY={node.y}>
+                <div className="w-[450px] overflow-hidden">
+                   {node.component}
                 </div>
-              )}
-            </React.Fragment>
-          ))}
+             </CanvasNode>
+           ))}
+        </Canvas>
 
-          {isLoading && <LoadingDots />}
-        </div>
-      </div>
-
-      {/* Fixed Input */}
-      <div className="sticky bottom-0 border-t-4 border-black bg-white px-4 py-4">
-        <div className="mx-auto max-w-4xl">
-          <ChatInput onSend={handleSend} disabled={isLoading} />
-        </div>
-      </div>
+        <ChatDock 
+          messages={messages} 
+          onSend={handleSend} 
+          isLoading={isLoading} 
+        />
+      </main>
     </div>
   );
 }

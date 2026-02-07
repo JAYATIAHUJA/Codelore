@@ -16,8 +16,8 @@ const bangers = Bangers({
 });
 
 export const metadata: Metadata = {
-  title: "AI Codebase Navigator",
-  description: "Talk to your codebase. The UI adapts.",
+  title: "CodeLore | Generative Code Intelligence Workspace",
+  description: "Experience the next-generation developer workspace where AI manifestations build your IDE on-the-fly.",
 };
 
 export default function RootLayout({
