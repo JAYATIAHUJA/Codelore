@@ -37,7 +37,7 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
       <button
         type="submit"
         disabled={disabled || !value.trim()}
-        className="comic-border-thick rounded-lg bg-[#FFD600] px-6 py-3 font-[var(--font-bangers)] text-lg tracking-wider text-black hover:bg-yellow-400 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+        className="border-black border-2 rounded-md bg-[#FFA6F6] hover:bg-[#fa8cef] active:bg-[#f774ea] px-6 py-2 font-[var(--font-bangers)] text-lg tracking-wider text-black transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-1 active:translate-y-1"
       >
         SEND!
       </button>

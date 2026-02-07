@@ -1,120 +1,72 @@
 "use client";
 
-import React, { useRef, useEffect } from "react";
-import { useTamboThread } from "@tambo-ai/react";
-import { ChatInput } from "@/components/chat/ChatInput";
-import { MessageBubble } from "@/components/chat/MessageBubble";
-import { LoadingDots } from "@/components/chat/LoadingDots";
+import { motion, useScroll, useSpring } from "framer-motion";
+import Link from "next/link";
+import { HeroSection } from "@/components/landing/HeroSection";
+import { ProblemSection } from "@/components/landing/ProblemSection";
+import { ValuePropSection } from "@/components/landing/ValuePropSection";
+import { ShowcaseSection } from "@/components/landing/ShowcaseSection";
+import { AllianceSection } from "@/components/landing/AllianceSection";
+import { Footer } from "@/components/landing/Footer";
 
-const WELCOME_SUGGESTIONS = [
-  "Explain this project",
-  "Show folder structure",
-  "Focus on backend",
-  "Only auth flow",
-  "What does login.ts do?",
-];
-
-export default function Home() {
-  const { thread, sendThreadMessage, isIdle } = useTamboThread();
-  const isLoading = !isIdle;
-  const scrollRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
-  }, [thread?.messages, isLoading]);
-
-  const handleSend = async (text: string) => {
-    try {
-      await sendThreadMessage(text);
-    } catch (error) {
-      console.error("Failed to send message:", error);
-      // Log full error details for debugging
-      if (typeof error === 'object' && error !== null) {
-        console.error("Error details:", JSON.stringify(error, null, 2));
-      }
-      alert("Failed to send message to AI. Please check the console for details.");
-    }
-  };
-
-  const messages = thread?.messages ?? [];
+export default function LandingPage() {
+  const { scrollYProgress } = useScroll();
+  const scaleX = useSpring(scrollYProgress, {
+    stiffness: 100,
+    damping: 30,
+    restDelta: 0.001
+  });
 
   return (
-    <div className="flex min-h-screen flex-col bg-[var(--color-comic-white)]">
-      {/* Header */}
-      <header className="sticky top-0 z-50 border-b-4 border-black bg-[#FFD600] px-4 py-3">
-        <div className="mx-auto flex max-w-4xl items-center justify-between">
-          <div className="flex items-center gap-3">
-            <span className="text-3xl">🗺️</span>
-            <h1 className="font-[var(--font-bangers)] text-2xl tracking-wider">
-              AI CODEBASE NAVIGATOR
-            </h1>
+    <main className="noise-bg selection:bg-brutal-blue selection:text-brutal-white font-[var(--font-comic-neue)]">
+      {/* Scroll Progress Bar */}
+      <motion.div
+        className="fixed top-0 left-0 right-0 h-2 bg-brutal-blue z-[100] origin-left"
+        style={{ scaleX }}
+      />
+
+      <HeroSection />
+      
+      <ProblemSection />
+      
+      <ValuePropSection />
+      
+      <ShowcaseSection />
+      
+      <AllianceSection />
+
+      {/* Final Statement */}
+      <section className="py-40 px-6 bg-brutal-white text-center border-b-8 border-brutal-black">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="space-y-12"
+        >
+          <h2 className="text-6xl lg:text-9xl font-[var(--font-bangers)] leading-tight text-brutal-black uppercase italic">
+            INTERFACES SHOULD RESPOND.<br />
+            NOT INSTRUCT.
+          </h2>
+          
+          <Link href="/interface" className="inline-block">
+            <button className="brutal-btn-cyan text-3xl px-12 h-20 uppercase tracking-widest">
+              Join The Interface
+            </button>
+          </Link>
+          <div className="flex justify-center gap-4 mt-8">
+             <button className="brutal-btn-pink-square shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                   <path d="M10.8425 24V0H13.1575V24H10.8425ZM0 13.1664V10.8336H24V13.1664H0Z" fill="black"/>
+                </svg>
+             </button>
+             <button className="brutal-btn-cyan">
+                Documentation
+             </button>
           </div>
-          <span className="comic-border rounded-full bg-white px-3 py-1 text-xs font-bold">
-            GENERATIVE UI
-          </span>
-        </div>
-      </header>
+        </motion.div>
+      </section>
 
-      {/* Messages Area */}
-      <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-6">
-        <div className="mx-auto max-w-4xl space-y-4">
-          {/* Welcome state when no messages */}
-          {messages.length === 0 && (
-            <div className="flex flex-col items-center justify-center py-16 text-center comic-enter">
-              <span className="text-6xl mb-4">💬</span>
-              <h2 className="font-[var(--font-bangers)] text-3xl tracking-wider mb-2">
-                TALK TO YOUR CODEBASE!
-              </h2>
-              <p className="text-zinc-600 text-base mb-6 max-w-md">
-                Ask anything about the project. The UI will transform based on what you want to understand.
-              </p>
-              <div className="flex flex-wrap justify-center gap-2">
-                {WELCOME_SUGGESTIONS.map((s) => (
-                  <button
-                    key={s}
-                    onClick={() => handleSend(s)}
-                    className="comic-border rounded-full bg-white px-4 py-2 text-sm font-semibold hover:bg-yellow-50 active:scale-95 transition-all"
-                  >
-                    &ldquo;{s}&rdquo;
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Render messages */}
-          {messages.map((msg) => (
-            <React.Fragment key={msg.id}>
-              {/* User message */}
-              {msg.role === "user" && msg.content && (
-                <MessageBubble role="user" content={msg.content} />
-              )}
-
-              {/* AI text response */}
-              {msg.role === "assistant" && msg.content && (
-                <MessageBubble role="assistant" content={msg.content} />
-              )}
-
-              {/* AI generative component */}
-              {msg.role === "assistant" && msg.renderedComponent && (
-                <div className="comic-enter">
-                  {msg.renderedComponent}
-                </div>
-              )}
-            </React.Fragment>
-          ))}
-
-          {/* Loading */}
-          {isLoading && <LoadingDots />}
-        </div>
-      </div>
-
-      {/* Fixed Input */}
-      <div className="sticky bottom-0 border-t-4 border-black bg-white px-4 py-4">
-        <div className="mx-auto max-w-4xl">
-          <ChatInput onSend={handleSend} disabled={isLoading} />
-        </div>
-      </div>
-    </div>
+      <Footer />
+    </main>
   );
 }
