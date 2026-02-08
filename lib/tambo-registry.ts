@@ -114,11 +114,11 @@ export const componentRegistry: TamboComponent[] = [
       columns: z
         .any()
         .optional()
-        .describe("Array of 2-4 columns for flow stages. Each column has: title (string), color (hex string like '#FFD600'), blocks (array of {id, label, code, highlights?, description?})"),
+        .describe(`REQUIRED: An array of 2-4 column objects. NEVER leave this empty. Each column MUST have: title (string), color (hex string), blocks (non-empty array). Example: [{"title":"Entry Point","color":"#FFD600","blocks":[{"id":"main","label":"main()","code":"async function main() {\n  const app = createApp();\n  await app.listen(3000);\n}","highlights":["createApp"],"description":"App entry"}]},{"title":"Service Layer","color":"#bbdefb","blocks":[{"id":"svc","label":"createApp()","code":"function createApp() {\n  const router = new Router();\n  return router;\n}","highlights":["Router"]}]}]`),
       connections: z
         .any()
         .optional()
-        .describe("Array of arrows between blocks. Each has: from (block ID), to (block ID), label? (string)"),
+        .describe(`Array of arrow objects connecting blocks by ID. Example: [{"from":"main","to":"svc","label":"calls"},{"from":"svc","to":"db","label":"queries"}]`),
     }),
   },
   {

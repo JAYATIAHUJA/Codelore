@@ -34,7 +34,6 @@ export function ChatDock() {
 
     if (repoData && !hasSentContext.current && !isLoading) {
       console.log("Injecting repo context to AI...");
-      const fileList = repoData.files.filter(f => f.type === "file").map(f => f.path).join("\n");
       
       const moduleSummary = repoData.modules?.length 
         ? repoData.modules.map(m => 
@@ -50,35 +49,31 @@ export function ChatDock() {
         ? `Frameworks: ${repoData.stats.frameworks.join(", ")}`
         : "";
 
-      const contextMessage = `I have connected to the repository "${repoData.repo.owner}/${repoData.repo.name}" (${repoData.repo.description || "no description"}).
-${langInfo}
-${frameworkInfo}
-Total files: ${repoData.stats.totalFiles}, Total folders: ${repoData.stats.totalFolders}
+      // Limit file list to avoid Tambo API payload limits
+      const trimmedFileList = repoData.files
+        .filter(f => f.type === "file")
+        .map(f => f.path)
+        .slice(0, 80)
+        .join("\n");
+      const fileCount = repoData.files.filter(f => f.type === "file").length;
+      const truncatedNote = fileCount > 80 ? `\n... and ${fileCount - 80} more files` : "";
 
-Detected Modules:
+      const contextMessage = `Repository: ${repoData.repo.owner}/${repoData.repo.name} (${repoData.repo.description || "no description"}).
+${langInfo} ${frameworkInfo}
+Files: ${repoData.stats.totalFiles}, Folders: ${repoData.stats.totalFolders}
+
+Modules:
 ${moduleSummary}
 
-File structure (paths):
-${fileList}
+Key files:
+${trimmedFileList}${truncatedNote}
 
-CRITICAL RULES — ALWAYS follow these:
-1. When I ask for "folder structure" or "file tree" → render TreeView (it auto-reads repo data)
-2. When I ask for "architecture" or "modules" or "explain project" → render ModuleCards (it auto-reads repo data)
-3. When I ask for ANY flow, lifecycle, trace, sequence, or "how does X work" → render CodeFlowGraph with columns of code blocks and connections. NEVER answer flow questions with plain text. ALWAYS generate the visual CodeFlowGraph component with realistic code snippets based on the files you can see.
-4. Do NOT generate fake/mock data. Use the actual file paths and structure above to generate realistic code.
-
-IMPORTANT: The repository data is already loaded. When I ask for "folder structure" or "file tree", render the TreeView component — it will automatically read the real file data from context. When I ask for "architecture" or "modules", render ModuleCards — it will automatically show the detected modules.
-
-For GRAPH VISUALIZATIONS: Use the enhanced ProjectGraph component to create intelligent, interactive graphs. You can:
-- Create custom nodes with specific types (frontend, backend, database, api, config, tests, entry, utils, services, routes, controllers)
-- Define edges with relationship types (import, data-flow, api-call, dependency)
-- Control layout (horizontal/vertical/radial, spacing, algorithm)
-- Apply themes (modern, brutal, minimal, colorful)
-- Add animations and backgrounds
-
-The ProjectGraph component automatically handles icon mapping, color schemes, and intelligent layout based on the repository structure. Use it for requests like "show project graph", "visualize architecture", "create dependency map", etc.
-
-Do NOT generate fake/mock data. The components pull real data from the connected repository.`;
+RULES:
+1. "folder structure" / "file tree" → render TreeView
+2. "architecture" / "modules" / "explain project" → render ModuleCards
+3. ANY flow/lifecycle/trace/sequence/"how does X work" → render CodeFlowGraph with columns containing code blocks. You MUST populate the columns array with objects like {title:"Stage", color:"#FFD600", blocks:[{id:"b1", label:"functionName()", code:"actual code here"}]} and connections like [{from:"b1", to:"b2", label:"calls"}]. NEVER leave columns empty.
+4. "show project graph" / "visualize architecture" / "dependency map" → render ProjectGraph with nodes and edges.
+5. Use real file paths from above. Do NOT generate fake data.`;
 
       sendMessage(contextMessage);
       hasSentContext.current = true;
