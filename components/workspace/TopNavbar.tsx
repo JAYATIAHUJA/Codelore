@@ -1,16 +1,18 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Github, Search, Share, Settings, ChevronDown, Command, Unplug } from "lucide-react";
+import { Github, Search, Share, Settings, Command, Unplug, Plus, X } from "lucide-react";
 import { useRepo } from "@/components/providers/RepoProvider";
+import { useWorkspaceTabs } from "@/components/providers/WorkspaceTabsProvider";
 
 export function TopNavbar() {
   const { repoData, setRepoData } = useRepo();
+  const { tabs, activeTabId, addTab, removeTab, switchTab } = useWorkspaceTabs();
 
   return (
     <nav className="h-14 border-b-2 border-brutal-black bg-white flex items-center justify-between px-4 z-50 sticky top-0">
-      {/* Left: Branding & Repo */}
-      <div className="flex items-center gap-6">
+      {/* Left: Branding & Tabs */}
+      <div className="flex items-center gap-4">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 bg-brutal-black flex items-center justify-center brutal-border-thick rotate-3 shadow-[2px_2px_0px_black]">
              <span className="text-white font-[var(--font-bangers)] text-sm tracking-tight">CL</span>
@@ -20,29 +22,50 @@ export function TopNavbar() {
 
         <div className="h-6 w-[2px] bg-zinc-200" />
 
-        {repoData ? (
-          <div className="flex items-center gap-3 group px-2 py-1 rounded transition-colors animate-in slide-in-from-left-2">
-            <Github size={18} className="text-brutal-blue" />
-            <div className="flex flex-col">
-              <span className="text-[10px] uppercase font-bold text-zinc-400 leading-none">Repository</span>
-              <div className="flex items-center gap-1">
-                 <span className="text-sm font-bold font-mono">{repoData.repo.owner} / {repoData.repo.name}</span>
-                 <button 
-                  onClick={() => setRepoData(null)}
-                  className="p-1 hover:bg-red-50 hover:text-brutal-red rounded transition-colors"
-                  title="Disconnect Repository"
-                 >
-                    <Unplug size={12} />
-                 </button>
-              </div>
-            </div>
-          </div>
-        ) : (
-          <div className="flex items-center gap-2 px-3 py-1 bg-zinc-50 border border-zinc-200 rounded">
-             <div className="w-2 h-2 rounded-full bg-zinc-300 animate-pulse" />
-             <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">No Active Repo</span>
-          </div>
-        )}
+        {/* Workspace Tabs */}
+        <div className="flex items-center gap-1">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => switchTab(tab.id)}
+              className={`group flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider border-2 rounded transition-all ${
+                tab.id === activeTabId
+                  ? "border-black bg-brutal-black text-white shadow-[2px_2px_0px_black]"
+                  : "border-zinc-300 bg-white text-zinc-500 hover:border-black hover:text-black"
+              }`}
+            >
+              {tab.repoData ? (
+                <span className="flex items-center gap-1">
+                  <Github size={10} />
+                  {tab.repoData.repo.name}
+                </span>
+              ) : (
+                <span>Empty</span>
+              )}
+              {tabs.length > 1 && (
+                <span
+                  onClick={(e) => { e.stopPropagation(); removeTab(tab.id); }}
+                  className={`ml-1 rounded-full p-0.5 transition-colors ${
+                    tab.id === activeTabId 
+                      ? "hover:bg-white/20" 
+                      : "hover:bg-zinc-200 opacity-0 group-hover:opacity-100"
+                  }`}
+                >
+                  <X size={8} />
+                </span>
+              )}
+            </button>
+          ))}
+
+          {/* Add Tab Button */}
+          <button
+            onClick={addTab}
+            className="w-7 h-7 border-2 border-dashed border-zinc-300 flex items-center justify-center hover:border-black hover:bg-zinc-50 transition-all rounded text-zinc-400 hover:text-black"
+            title="Open new workspace"
+          >
+            <Plus size={14} />
+          </button>
+        </div>
       </div>
 
       {/* Center: Command Bar */}

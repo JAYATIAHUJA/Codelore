@@ -1,11 +1,11 @@
-import { type TamboComponent } from "@tambo-ai/react";
-import { TreeView } from "@/components/generative/TreeView";
-import { ModuleCards } from "@/components/generative/ModuleCards";
-import { FlowDiagram } from "@/components/generative/FlowDiagram";
-import { FileSummary } from "@/components/generative/FileSummary";
-import { GuidanceCard } from "@/components/generative/GuidanceCard";
 import { CodeFlowGraph } from "@/components/generative/CodeFlowGraph";
+import { FileSummary } from "@/components/generative/FileSummary";
+import { FlowDiagram } from "@/components/generative/FlowDiagram";
 import { GenerativeTable } from "@/components/generative/GenerativeTable";
+import { GuidanceCard } from "@/components/generative/GuidanceCard";
+import { ModuleCards } from "@/components/generative/ModuleCards";
+import { TreeView } from "@/components/generative/TreeView";
+import { type TamboComponent } from "@tambo-ai/react";
 import { z } from "zod";
 
 export const componentRegistry: TamboComponent[] = [
@@ -102,44 +102,22 @@ export const componentRegistry: TamboComponent[] = [
   {
     name: "CodeFlowGraph",
     description:
-      "Shows a detailed code-level flow diagram with actual code snippets, highlighted function calls, and arrows connecting code blocks across columns. Use when user asks for 'code flow', 'how does X work step by step', 'show me the initialization flow', 'trace the code path', 'entry point flow', 'startup sequence', 'request lifecycle', or any request for a visual code walkthrough with actual code. This is more detailed than FlowDiagram — it shows real code, not just labels. Generate columns for logical stages (e.g. 'Entry Point', 'Initialization', 'Service Layer') and populate each with code blocks containing realistic code snippets from the connected repository.",
+      "ALWAYS use this component when the user asks about any kind of flow, lifecycle, trace, sequence, pipeline, or 'how does X work'. Shows a visual diagram with code snippets in columns connected by arrows. Use for: 'show database flow', 'request lifecycle', 'trace the code path', 'how does auth work', 'show startup flow', 'API flow', 'show me the flow for X'. NEVER respond with plain text for flow questions — ALWAYS render this component instead.",
     component: CodeFlowGraph,
     propsSchema: z.object({
       title: z
         .string()
+        .nullish()
         .optional()
-        .default("CODE FLOW")
-        .describe("A comic-style title, e.g. 'STARTUP FLOW!', 'REQUEST LIFECYCLE!', 'ENTRY POINT TRACE!'"),
+        .describe("Comic-style title like 'REQUEST LIFECYCLE!' or 'DATABASE FLOW!'"),
       columns: z
-        .array(
-          z.object({
-            title: z.string().optional().default("Stage").describe("Column stage name, e.g. 'Entry Point', 'Initialization', 'Service Layer'"),
-            color: z.string().optional().default("#e0e0e0").describe("Background color hex for the column header, e.g. '#FFD600' (yellow), '#bbdefb' (light blue), '#c8e6c9' (light green)"),
-            blocks: z.array(
-              z.object({
-                id: z.string().optional().default("block").describe("Unique ID for the block, e.g. 'main', 'startup', 'createServices'"),
-                label: z.string().optional().default("").describe("Label shown above code, e.g. 'private async startup()', 'main(): void'"),
-                code: z.string().optional().default("// No code provided").describe("The actual code snippet to display. Use realistic code with function calls, try/catch, await, etc. Keep to 4-10 lines. Use \\n for newlines."),
-                highlights: z.array(z.string()).optional().default([]).describe("Function names or keywords to highlight in the code with a blue background, e.g. ['startup', 'createServices']"),
-                description: z.string().optional().describe("Optional short explanation shown below the code block"),
-              })
-            ).optional().default([]).describe("Code blocks within this column. Each block shows a code snippet with optional highlights."),
-          })
-        )
+        .any()
         .optional()
-        .default([])
-        .describe("Columns representing stages in the code flow. Arrange left-to-right for the logical progression."),
+        .describe("Array of 2-4 columns for flow stages. Each column has: title (string), color (hex string like '#FFD600'), blocks (array of {id, label, code, highlights?, description?})"),
       connections: z
-        .array(
-          z.object({
-            from: z.string().optional().default("").describe("ID of the source code block"),
-            to: z.string().optional().default("").describe("ID of the target code block"),
-            label: z.string().optional().describe("Arrow label, e.g. 'calls', 'returns', 'awaits'"),
-          })
-        )
+        .any()
         .optional()
-        .default([])
-        .describe("Arrows connecting code blocks to show the flow between them."),
+        .describe("Array of arrows between blocks. Each has: from (block ID), to (block ID), label? (string)"),
     }),
   },
   {

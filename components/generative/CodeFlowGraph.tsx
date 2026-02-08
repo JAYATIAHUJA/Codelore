@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
 import { ComicPanel } from "@/components/ui/ComicPanel";
+import React, { useState } from "react";
 
 export interface CodeBlock {
   id: string;
@@ -139,9 +139,26 @@ function Arrow({ label, direction = "down" }: { label?: string; direction?: "dow
 
 export function CodeFlowGraph({
   title = "CODE FLOW",
-  columns = [],
-  connections = [],
+  columns: rawColumns,
+  connections: rawConnections,
 }: CodeFlowGraphProps) {
+  // Bulletproof: handle null, undefined, or non-array inputs
+  const columns = Array.isArray(rawColumns) && rawColumns.length > 0
+    ? rawColumns.map(col => ({
+        ...col,
+        title: col.title || "Stage",
+        color: col.color || "#FFD600",
+        blocks: Array.isArray(col.blocks) ? col.blocks.map(b => ({
+          ...b,
+          id: b.id || `block-${Math.random()}`,
+          label: b.label || "",
+          code: b.code || "// ...",
+          highlights: Array.isArray(b.highlights) ? b.highlights : [],
+        })) : [],
+      }))
+    : [];
+  const connections = Array.isArray(rawConnections) ? rawConnections : [];
+
   if (!columns.length) {
     return (
       <ComicPanel title={title} color="#e53935">

@@ -3,6 +3,7 @@ import { Comic_Neue, Bangers } from "next/font/google";
 import "./globals.css";
 import { TamboProviderWrapper } from "@/components/providers/TamboProviderWrapper";
 import { RepoProvider } from "@/components/providers/RepoProvider";
+import { WorkspaceTabsProvider } from "@/components/providers/WorkspaceTabsProvider";
 
 const comicNeue = Comic_Neue({
   subsets: ["latin"],
@@ -32,7 +33,9 @@ export default function RootLayout({
         className={`${comicNeue.variable} ${bangers.variable} font-[var(--font-comic-neue)] antialiased`}
       >
         <RepoProvider>
-          <TamboProviderWrapper>{children}</TamboProviderWrapper>
+          <WorkspaceTabsProvider>
+            <TamboProviderWrapper>{children}</TamboProviderWrapper>
+          </WorkspaceTabsProvider>
         </RepoProvider>
       </body>
     </html>
