@@ -3,15 +3,10 @@
 import { ChatInput } from "@/components/chat/ChatInput";
 import { LoadingDots } from "@/components/chat/LoadingDots";
 import { MessageBubble } from "@/components/chat/MessageBubble";
-import { Target, MoreHorizontal, Zap } from "lucide-react";
-import { ChatInput } from "@/components/chat/ChatInput";
-import { LoadingDots } from "@/components/chat/LoadingDots";
-import { MessageBubble } from "@/components/chat/MessageBubble";
-import { useRef, useEffect, useMemo } from "react";
 import { useRepo } from "@/components/providers/RepoProvider";
 import { useTamboThread } from "@tambo-ai/react";
 import { MoreHorizontal, Target, Zap } from "lucide-react";
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 
 
 export function ChatDock() {
@@ -70,7 +65,8 @@ CRITICAL RULES — ALWAYS follow these:
 1. When I ask for "folder structure" or "file tree" → render TreeView (it auto-reads repo data)
 2. When I ask for "architecture" or "modules" or "explain project" → render ModuleCards (it auto-reads repo data)
 3. When I ask for ANY flow, lifecycle, trace, sequence, or "how does X work" → render CodeFlowGraph with columns of code blocks and connections. NEVER answer flow questions with plain text. ALWAYS generate the visual CodeFlowGraph component with realistic code snippets based on the files you can see.
-4. Do NOT generate fake/mock data. Use the actual file paths and structure above to generate realistic code.`;
+4. Do NOT generate fake/mock data. Use the actual file paths and structure above to generate realistic code.
+
 IMPORTANT: The repository data is already loaded. When I ask for "folder structure" or "file tree", render the TreeView component — it will automatically read the real file data from context. When I ask for "architecture" or "modules", render ModuleCards — it will automatically show the detected modules.
 
 For GRAPH VISUALIZATIONS: Use the enhanced ProjectGraph component to create intelligent, interactive graphs. You can:
