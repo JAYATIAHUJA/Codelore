@@ -31,15 +31,15 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
         value={value}
         onChange={(e) => setValue(e.target.value)}
         disabled={disabled}
-        placeholder='Try: "Explain this project" or "Show auth flow"'
-        className="flex-1 comic-border rounded-lg px-4 py-3 text-base font-semibold bg-white placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 disabled:opacity-50"
+        placeholder='Inquire about architecture...'
+        className="flex-1 border arch-border rounded-sm px-4 py-3 text-xs font-medium bg-background text-text-primary placeholder:text-text-secondary/50 focus:outline-none focus:border-accent/40 disabled:opacity-50 transition-all arch-shadow-sm"
       />
       <button
         type="submit"
         disabled={disabled || !value.trim()}
-        className="border-black border-2 rounded-md bg-[#FFA6F6] hover:bg-[#fa8cef] active:bg-[#f774ea] px-6 py-2 font-[var(--font-bangers)] text-lg tracking-wider text-black transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-1 active:translate-y-1"
+        className="arch-btn-primary px-5 py-2 uppercase text-[10px] tracking-widest disabled:opacity-50 disabled:cursor-not-allowed arch-shadow transition-all"
       >
-        SEND!
+        Send
       </button>
     </form>
   );

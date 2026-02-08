@@ -58,45 +58,45 @@ export function ModuleCards({ filter = "all", title = "PROJECT OVERVIEW", module
   });
 
   return (
-    <ComicPanel title={title} color="#FFD600">
+    <ComicPanel title={title} color="var(--accent)">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         {visible.map((mod) => (
           <div
             key={mod.name}
-            className="comic-border rounded-lg p-4 bg-white hover:scale-[1.02] transition-transform cursor-default"
+            className="arch-border border rounded-sm p-4 bg-surface hover:scale-[1.01] transition-transform cursor-default arch-shadow"
           >
-            <div className="flex items-center gap-2 mb-2">
+            <div className="flex items-center gap-2 mb-3">
               <div
-                className="w-4 h-4 rounded-full border-2 border-black"
-                style={{ backgroundColor: mod.color }}
+                className="w-2.5 h-2.5 rounded-full border border-text-primary/20"
+                style={{ backgroundColor: mod.color || "var(--accent)" }}
               />
-              <h3 className="font-[var(--font-bangers)] text-lg tracking-wide">{mod.name}</h3>
+              <h3 className="text-xs font-bold uppercase tracking-widest text-text-primary">{mod.name}</h3>
             </div>
-            <p className="text-sm text-zinc-700 mb-3 leading-relaxed">{mod.description}</p>
-            <div className="mb-2">
-              <span className="text-xs font-bold uppercase text-zinc-500">Key Files:</span>
-              <div className="flex flex-wrap gap-1 mt-1">
+            <p className="text-[11px] text-text-secondary mb-4 leading-relaxed font-medium">{mod.description}</p>
+            <div className="mb-3">
+              <span className="text-[8px] font-bold uppercase tracking-widest text-text-secondary/60">Key Files</span>
+              <div className="flex flex-wrap gap-1.5 mt-2">
                 {mod.files.slice(0, 4).map((f) => (
                   <span
                     key={f}
-                    className="inline-block rounded bg-zinc-100 border border-zinc-300 px-2 py-0.5 text-xs font-mono"
+                    className="inline-block rounded-sm bg-text-primary/5 border arch-border px-2 py-0.5 text-[9px] font-mono text-text-primary"
                   >
                     {f}
                   </span>
                 ))}
                 {mod.files.length > 4 && (
-                  <span className="text-xs text-zinc-400">+{mod.files.length - 4} more</span>
+                  <span className="text-[9px] text-text-secondary/40 font-mono">+{mod.files.length - 4}</span>
                 )}
               </div>
             </div>
             {mod.dependencies && mod.dependencies.length > 0 && (
               <div>
-                <span className="text-xs font-bold uppercase text-zinc-500">Depends on:</span>
-                <div className="flex flex-wrap gap-1 mt-1">
+                <span className="text-[8px] font-bold uppercase tracking-widest text-text-secondary/60">Depends on</span>
+                <div className="flex flex-wrap gap-1.5 mt-2">
                   {mod.dependencies.map((d) => (
                     <span
                       key={d}
-                      className="inline-block rounded-full bg-yellow-100 border border-yellow-400 px-2 py-0.5 text-xs font-semibold"
+                      className="inline-block rounded-sm bg-accent/10 border border-accent/20 px-2 py-0.5 text-[9px] font-bold text-accent uppercase tracking-tighter"
                     >
                       {d}
                     </span>

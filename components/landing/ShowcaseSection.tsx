@@ -2,102 +2,125 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
+import { MessageSquare, Layout, Share2, Zap } from "lucide-react";
 
-const FLOWS = [
+const SCENARIOS = [
   {
-    input: "Explain this project",
-    component: "ModuleCards",
-    content: "Shows high-level architecture: Auth, API, DB, Frontend",
-    color: "bg-brutal-yellow",
-    icon: "🗺️"
+    query: "Show auth flow",
+    responseTitle: "FlowDiagram",
+    description: "CodeLore identifies the authentication logic and renders a step-by-step sequence map.",
+    icon: Layout,
   },
   {
-    input: "Focus on backend",
-    component: "BackendTree",
-    content: "Frontend disappears. Only core logic remains.",
-    color: "bg-brutal-blue",
-    icon: "⚙️"
+    query: "Explain backend",
+    responseTitle: "ModuleCards",
+    description: "The interface reorganizes to highlight core service layers and system entry points.",
+    icon: Zap,
   },
   {
-    input: "Only auth flow",
-    component: "FlowDiagram",
-    content: "Login → Middleware → Controller → Database",
-    color: "bg-brutal-red",
-    icon: "🔐"
+    query: "Trace file-service.ts",
+    responseTitle: "CodeFlowGraph",
+    description: "Generates a detailed code-level trace across multiple functions and files.",
+    icon: Share2,
   }
 ];
 
 export function ShowcaseSection() {
-  const [activeFlow, setActiveFlow] = useState(0);
+  const [active, setActive] = useState(0);
+  const ActiveIcon = SCENARIOS[active].icon;
 
   return (
-    <section className="py-32 px-6 lg:px-20 bg-brutal-black text-brutal-white">
-      <div className="max-w-6xl mx-auto space-y-20">
-        <div className="flex flex-col lg:flex-row justify-between items-end gap-8">
-          <h2 className="text-6xl lg:text-9xl font-[var(--font-bangers)]">BUILT WITH TAMBO.</h2>
-          <p className="text-xl font-bold uppercase text-brutal-yellow italic max-w-sm">
-            Magical results, logical execution.
+    <section id="demo" className="py-32 px-6 bg-surface border-b arch-border border-l-0 border-r-0 border-t-0">
+      <div className="arch-container">
+        <div className="max-w-3xl mb-16">
+          <motion.h2 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-3xl md:text-5xl font-bold tracking-tight text-text-primary"
+          >
+            An Interface That Adapts To You.
+          </motion.h2>
+          <p className="mt-6 text-lg text-text-secondary">
+            CodeLore doesn't just give answers; it constructs the perfect visual tool for the specific problem you're solving.
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
+        <div className="grid lg:grid-cols-2 gap-16 items-start">
           <div className="space-y-4">
-            {FLOWS.map((flow, i) => (
+            {SCENARIOS.map((scenario, idx) => (
               <button
-                key={i}
-                onClick={() => setActiveFlow(i)}
-                className={`w-full text-left p-6 brutal-border transition-all flex items-center justify-between group ${
-                  activeFlow === i ? "bg-brutal-blue translate-x-4" : "bg-zinc-900 border-zinc-700 hover:border-brutal-blue"
+                key={idx}
+                onClick={() => setActive(idx)}
+                className={`w-full text-left p-6 transition-all duration-300 flex items-start gap-4 border rounded-sm ${
+                  active === idx 
+                  ? "bg-background arch-border arch-shadow ring-1 ring-accent/20" 
+                  : "bg-background/40 border-transparent hover:border-border/50 text-text-secondary"
                 }`}
               >
-                <div className="space-y-1">
-                  <span className="text-xs font-bold font-mono opacity-50 uppercase tracking-widest">User Query</span>
-                  <p className="text-2xl font-bold">"{flow.input}"</p>
+                <div className={`mt-1 p-2 rounded-sm border arch-border ${active === idx ? "bg-accent text-[#000000]" : "bg-surface text-text-secondary opacity-50"}`}>
+                  <MessageSquare className="w-4 h-4" />
                 </div>
-                <div className={`w-12 h-12 brutal-border flex items-center justify-center text-2xl transition-transform group-hover:rotate-12 ${
-                  activeFlow === i ? "bg-white" : "bg-black"
-                }`}>
-                  {flow.icon}
+                <div className="space-y-1">
+                  <p className={`text-xs font-mono font-bold uppercase tracking-widest ${active === idx ? "text-accent" : "text-text-secondary/60"}`}>User Query</p>
+                  <p className={`text-xl font-bold ${active === idx ? "text-text-primary" : "text-text-secondary"}`}>"{scenario.query}"</p>
+                  {active === idx && (
+                    <motion.p 
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      className="text-sm text-text-secondary mt-4 pt-4 border-t border-border/10"
+                    >
+                      {scenario.description}
+                    </motion.p>
+                  )}
                 </div>
               </button>
             ))}
           </div>
 
-          <div className="relative">
-            <div className="brutal-border-thick brutal-shadow bg-zinc-800 aspect-square flex flex-col overflow-hidden">
-               <div className="h-10 bg-black flex items-center px-4 gap-2">
-                 <div className="w-2 h-2 rounded-full bg-red-500" />
-                 <div className="w-2 h-2 rounded-full bg-yellow-500" />
-                 <div className="w-2 h-2 rounded-full bg-green-500" />
-                 <span className="text-[10px] font-mono text-zinc-500 ml-2">TAMBO_RUNTIME_V0.74</span>
+          <div className="relative aspect-square">
+            <div className="absolute inset-0 bg-text-primary/5 border arch-border -rotate-1 rounded-sm" />
+            <div className="relative h-full w-full bg-surface border arch-border arch-shadow flex flex-col p-8 items-center justify-center text-center overflow-hidden rounded-sm">
+               <div className="absolute top-0 inset-x-0 h-10 border-b arch-border bg-text-primary/5 flex items-center px-4 gap-2">
+                 <div className="w-2 h-2 rounded-full bg-text-secondary/20" />
+                 <div className="w-2 h-2 rounded-full bg-text-secondary/20" />
+                 <div className="w-2 h-2 rounded-full bg-text-secondary/20" />
+                 <span className="text-[10px] font-mono text-text-secondary/40 ml-2">GEN_PROCESS_ACTIVE</span>
                </div>
-               
-               <div className="flex-1 p-8 flex flex-col justify-center items-center text-center">
-                 <AnimatePresence mode="wait">
-                   <motion.div
-                    key={activeFlow}
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 1.1 }}
-                    transition={{ type: "spring", damping: 15 }}
-                    className="space-y-6"
-                   >
-                     <div className={`w-32 h-32 mx-auto brutal-border-thick ${FLOWS[activeFlow].color} flex items-center justify-center text-6xl rotate-3 shadow-[10px_10px_0px_0px_rgba(255,255,255,0.1)]`}>
-                        {FLOWS[activeFlow].icon}
+
+               <AnimatePresence mode="wait">
+                 <motion.div
+                  key={active}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  transition={{ duration: 0.4 }}
+                  className="space-y-8 w-full"
+                 >
+                   <div className="w-20 h-20 mx-auto bg-accent/5 border arch-border flex items-center justify-center text-accent rounded-sm">
+                      <ActiveIcon className="w-10 h-10" />
+                   </div>
+                   
+                   <div className="space-y-4">
+                      <h3 className="text-2xl font-bold tracking-tight uppercase text-text-primary">{SCENARIOS[active].responseTitle}</h3>
+                      <div className="flex flex-col gap-2 max-w-[240px] mx-auto">
+                        <div className="h-1.5 bg-text-secondary/20 rounded-full w-full" />
+                        <div className="h-1.5 bg-text-secondary/20 rounded-full w-5/6 mx-auto" />
+                        <div className="h-1.5 bg-text-secondary/20 rounded-full w-4/6 mx-auto" />
+                      </div>
+                   </div>
+
+                   <div className="grid grid-cols-2 gap-3 mt-8">
+                     <div className="aspect-video bg-text-primary/5 arch-border border-dashed p-2">
+                        <div className="h-full w-full bg-background/50" />
                      </div>
-                     <div className="space-y-2">
-                        <h3 className="text-3xl font-[var(--font-bangers)] tracking-wide">{FLOWS[activeFlow].component}</h3>
-                        <p className="font-mono text-zinc-400 text-sm">{FLOWS[activeFlow].content}</p>
+                     <div className="aspect-video bg-text-primary/5 arch-border border-dashed p-2">
+                        <div className="h-full w-full bg-background/50" />
                      </div>
-                     <div className="grid grid-cols-2 gap-2 max-w-[200px] mx-auto opacity-50">
-                        {[1,2,3,4].map(j => <div key={j} className="h-2 bg-zinc-600 rounded-full" />)}
-                     </div>
-                   </motion.div>
-                 </AnimatePresence>
-               </div>
+                   </div>
+                 </motion.div>
+               </AnimatePresence>
             </div>
-            {/* Absolute element behind */}
-            <div className="absolute -z-10 top-8 left-8 w-full h-full brutal-border-thick border-brutal-blue" />
           </div>
         </div>
       </div>

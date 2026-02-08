@@ -1,54 +1,72 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { FolderSearch, LayoutPanelLeft, LineChart } from "lucide-react";
+
+const PROBLEMS = [
+  {
+    title: "Manual file exploration",
+    description: "Digging through nested directories one by one is a 20th-century bottleneck.",
+    icon: FolderSearch,
+  },
+  {
+    title: "Fragmented architecture",
+    description: "Codebase logic often exists in silos. Connecting the dots manually is error-prone.",
+    icon: LayoutPanelLeft,
+  },
+  {
+    title: "Static dashboards",
+    description: "Most tools offer fixed views. They don't adapt to the specific question you're asking.",
+    icon: LineChart,
+  },
+];
 
 export function ProblemSection() {
   return (
-    <section className="bg-brutal-black py-32 px-6 lg:px-20 text-brutal-white relative overflow-hidden">
-      <div className="max-w-6xl mx-auto space-y-20">
-        <div className="flex flex-col lg:flex-row gap-12 items-end">
-          <motion.div 
-            initial={{ opacity: 0, y: 50 }}
+    <section className="bg-surface py-32 px-6 border-b arch-border border-l-0 border-r-0 border-t-0">
+      <div className="arch-container">
+        <div className="max-w-3xl mb-16">
+          <motion.h2 
+            initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="flex-1"
+            className="text-3xl md:text-5xl font-bold tracking-tight text-text-primary"
           >
-            <h2 className="text-6xl lg:text-8xl font-[var(--font-bangers)] leading-tight">
-              APPS MAKE USERS LEARN THE INTERFACE.
-            </h2>
-          </motion.div>
-          <div className="flex-1 space-y-8">
-            <div className="grid grid-cols-2 gap-4">
-              {["Clicking Folders", "Searching Files", "Endless Docs", "Manual Exploration"].map((text) => (
-                <div key={text} className="border-2 border-brutal-white p-4 font-bold text-lg uppercase flex items-center gap-2">
-                  <span className="w-2 h-2 bg-brutal-red" /> {text}
-                </div>
-              ))}
-            </div>
-            <p className="text-xl text-zinc-400 font-medium leading-relaxed">
-              Most tools give you summaries or static trees. <br /><br />
-              <span className="text-brutal-white">CodeLore does something different.</span> It's not just an answer — it's a dynamic rebuild of the UI based on your intent.
-            </p>
-          </div>
+            Understanding Large Repositories Is Slow.
+          </motion.h2>
+          <motion.p 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.1 }}
+            className="mt-6 text-lg text-text-secondary"
+          >
+            Modern development moves fast, but our mental models of the codebase move at the speed of manual exploration.
+          </motion.p>
         </div>
 
-        <div className="h-1 bg-brutal-white w-full" />
-
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.9 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true }}
-          className="text-center"
-        >
-          <h2 className="text-7xl lg:text-[10rem] font-[var(--font-bangers)] text-brutal-yellow tracking-widest italic">
-            GENERATIVE UI CHANGES THAT.
-          </h2>
-        </motion.div>
-      </div>
-
-      {/* Decorative background text */}
-      <div className="absolute top-1/2 left-0 -translate-y-1/2 text-[20rem] font-bold text-white/5 whitespace-nowrap pointer-events-none select-none">
-        PROBLEM PROBLEM PROBLEM
+        <div className="grid md:grid-cols-3 gap-8">
+          {PROBLEMS.map((problem, idx) => (
+            <motion.div
+              key={problem.title}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: idx * 0.1 }}
+              className="p-8 arch-border bg-background arch-shadow flex flex-col gap-6 rounded-sm"
+            >
+              <div className="w-12 h-12 rounded-sm bg-accent/5 flex items-center justify-center border arch-border border-accent/20">
+                <problem.icon className="w-6 h-6 text-accent" />
+              </div>
+              <div className="space-y-3">
+                <h3 className="text-xl font-bold tracking-tight text-text-primary">{problem.title}</h3>
+                <p className="text-text-secondary text-sm leading-relaxed">
+                  {problem.description}
+                </p>
+              </div>
+            </motion.div>
+          ))}
+        </div>
       </div>
     </section>
   );

@@ -13,7 +13,7 @@ export default function WorkspaceInterface() {
   const isRepoConnected = !!repoData;
 
   return (
-    <div className="flex flex-col h-screen overflow-hidden bg-white text-brutal-black selection:bg-brutal-blue selection:text-white">
+    <div className="flex flex-col h-screen overflow-hidden bg-background text-text-primary">
       <TopNavbar />
 
       <main className="flex flex-1 overflow-hidden relative">
@@ -23,25 +23,30 @@ export default function WorkspaceInterface() {
           <InfiniteCanvas>
             {/* Initial State Overlay: GitHub Connect */}
             {!isRepoConnected && (
-              <div className="absolute inset-0 flex items-center justify-center p-8 z-20 bg-white/60 backdrop-blur-sm animate-in fade-in duration-500 pointer-events-auto">
+              <div className="absolute inset-0 flex items-center justify-center p-8 z-20 bg-background/60 backdrop-blur-sm animate-in fade-in duration-500 pointer-events-auto">
                 <div className="max-w-xl w-full space-y-8 animate-in zoom-in-95 slide-in-from-bottom-4 duration-300">
-                  <div className="text-center space-y-2">
-                    <h2 className="text-5xl font-[var(--font-bangers)] uppercase tracking-widest italic outline-text">Initialize Workspace</h2>
-                    <p className="font-mono text-sm uppercase font-bold text-zinc-500">Connect a public codebase to manifest its topology on the infinite canvas.</p>
+                  <div className="text-center space-y-4">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border arch-border bg-surface-elevated/50 text-[10px] font-bold tracking-widest uppercase text-text-secondary">
+                      Initialization Phase
+                    </div>
+                    <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-text-primary leading-tight">Connect Your <br /> Architecture.</h2>
+                    <p className="text-text-secondary text-sm max-w-sm mx-auto">Connect a public GitHub repository to manifest its topology on the professional infinite canvas.</p>
                   </div>
-                  <GitHubInput />
-                  <div className="flex justify-center gap-12 pt-8 opacity-20 filter grayscale">
-                    <div className="flex flex-col items-center gap-2">
-                      <div className="w-12 h-12 brutal-border bg-emerald-100" />
-                      <span className="text-[10px] font-bold">SIDEBAR TREE</span>
+                  <div className="p-8 bg-surface arch-border arch-shadow rounded-sm">
+                    <GitHubInput />
+                  </div>
+                  <div className="flex justify-center gap-12 pt-8 opacity-40">
+                    <div className="flex flex-col items-center gap-3">
+                      <div className="w-12 h-12 arch-border bg-text-primary/5 rounded-sm" />
+                      <span className="text-[10px] font-bold tracking-widest uppercase text-text-secondary">Tree View</span>
                     </div>
-                    <div className="flex flex-col items-center gap-2">
-                      <div className="w-12 h-12 brutal-border bg-blue-100" />
-                      <span className="text-[10px] font-bold">AI ANALYSIS</span>
+                    <div className="flex flex-col items-center gap-3">
+                      <div className="w-12 h-12 arch-border bg-accent/10 rounded-sm" />
+                      <span className="text-[10px] font-bold tracking-widest uppercase text-text-secondary">AI Scan</span>
                     </div>
-                    <div className="flex flex-col items-center gap-2">
-                      <div className="w-12 h-12 brutal-border bg-pink-100" />
-                      <span className="text-[10px] font-bold">SPATIAL NODES</span>
+                    <div className="flex flex-col items-center gap-3">
+                      <div className="w-12 h-12 arch-border bg-text-primary/5 rounded-sm" />
+                      <span className="text-[10px] font-bold tracking-widest uppercase text-text-secondary">Spatial</span>
                     </div>
                   </div>
                 </div>

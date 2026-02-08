@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { ComicPanel } from "@/components/ui/ComicPanel";
+import { ChevronDown, ChevronRight } from "lucide-react";
 
 export interface CodeBlock {
   id: string;
@@ -45,7 +46,7 @@ function highlightCode(code: string, highlights: string[] = []) {
             result = (
               <>
                 {parts[0]}
-                <span className="bg-blue-200 text-blue-900 px-0.5 rounded font-bold border border-blue-300">
+                <span className="bg-accent/20 text-accent px-0.5 rounded-sm border border-accent/30 tracking-tight font-bold">
                   {hl}
                 </span>
                 {parts.slice(1).join(hl)}
@@ -71,29 +72,30 @@ function CodeBlockNode({ block }: { block: CodeBlock }) {
   return (
     <div className="relative group">
       <div
-        className="border-2 border-black bg-white rounded-lg overflow-hidden shadow-[3px_3px_0px_black] hover:shadow-[4px_4px_0px_black] transition-shadow cursor-pointer"
+        className="arch-border border bg-surface rounded-sm overflow-hidden arch-shadow hover:scale-[1.01] transition-transform cursor-pointer"
         onClick={() => setExpanded(!expanded)}
       >
         {block.label && (
-          <div className="px-3 py-1.5 bg-green-50 border-b-2 border-black flex items-center justify-between">
-            <span className="font-mono text-xs font-bold text-green-800">
+          <div className="px-3 py-1.5 bg-text-primary/5 border-b arch-border flex items-center justify-between">
+            <span className="font-mono text-[9px] font-bold uppercase tracking-widest text-text-primary">
               {block.label}
             </span>
-            <span className="text-[10px] text-zinc-400">
-              {expanded ? "▼" : "▶"}
+            <span className="text-[10px] text-text-secondary/40">
+              {expanded ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
             </span>
           </div>
         )}
         {expanded && (
-          <div className="p-3 bg-slate-50 overflow-x-auto">
-            <pre className="text-[11px] font-mono text-slate-800 whitespace-pre leading-5">
+          <div className="p-4 bg-background overflow-x-auto">
+            <pre className="text-[10px] font-mono text-text-primary whitespace-pre leading-5">
               {highlightCode(block.code, block.highlights)}
             </pre>
           </div>
         )}
         {block.description && (
-          <div className="px-3 py-1.5 bg-amber-50 border-t border-dashed border-amber-300 text-[10px] text-amber-800 font-medium">
-            💡 {block.description}
+          <div className="px-3 py-3 bg-accent/5 border-t border-dashed arch-border text-[10px] text-text-secondary font-medium italic">
+            <span className="text-accent not-italic font-bold mr-2">ANALYSIS</span>
+            {block.description}
           </div>
         )}
       </div>
@@ -106,15 +108,15 @@ function Arrow({ label, direction = "down" }: { label?: string; direction?: "dow
     return (
       <div className="flex items-center justify-center px-2 min-w-[60px]">
         <div className="flex items-center gap-1">
-          <div className="h-0.5 w-6 bg-blue-500" />
+          <div className="h-0.5 w-6 bg-accent/60" />
           {label && (
-            <span className="text-[9px] font-bold text-blue-600 whitespace-nowrap">
+            <span className="text-[9px] font-bold text-text-primary uppercase tracking-widest whitespace-nowrap">
               {label}
             </span>
           )}
           <div className="relative">
-            <div className="h-0.5 w-4 bg-blue-500" />
-            <div className="absolute right-0 top-1/2 -translate-y-1/2 w-0 h-0 border-t-[4px] border-t-transparent border-b-[4px] border-b-transparent border-l-[6px] border-l-blue-500" />
+            <div className="h-0.5 w-4 bg-accent/60" />
+            <div className="absolute right-0 top-1/2 -translate-y-1/2 w-0 h-0 border-t-[4px] border-t-transparent border-b-[4px] border-b-transparent border-l-[6px] border-l-accent" />
           </div>
         </div>
       </div>
@@ -123,15 +125,15 @@ function Arrow({ label, direction = "down" }: { label?: string; direction?: "dow
 
   return (
     <div className="flex flex-col items-center py-1">
-      <div className="w-0.5 h-4 bg-blue-500" />
+      <div className="w-0.5 h-4 bg-accent/60" />
       {label && (
-        <span className="text-[9px] font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200">
+        <span className="text-[9px] font-bold text-text-primary uppercase tracking-widest bg-accent/10 px-1.5 py-0.5 rounded border arch-border">
           {label}
         </span>
       )}
       <div className="relative">
-        <div className="w-0.5 h-4 bg-blue-500" />
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[4px] border-l-transparent border-r-[4px] border-r-transparent border-t-[6px] border-t-blue-500" />
+        <div className="w-0.5 h-4 bg-accent/60" />
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[4px] border-l-transparent border-r-[4px] border-r-transparent border-t-[6px] border-t-accent" />
       </div>
     </div>
   );

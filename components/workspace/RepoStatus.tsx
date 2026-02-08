@@ -13,28 +13,28 @@ export function RepoStatus() {
   const { repo, stats } = repoData;
 
   return (
-    <div className="p-3 bg-white border-2 border-brutal-black brutal-shadow-sm">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
+    <div className="p-4 bg-surface border-b arch-border">
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex flex-col gap-1">
           <div className="flex items-center gap-2">
-            <Github size={16} className="text-black" />
-            <span className="font-bold text-sm">
+            <Github size={14} className="text-text-primary" />
+            <span className="font-bold text-sm tracking-tight text-text-primary">
               {repo.owner}/{repo.name}
             </span>
           </div>
           
-          <div className="flex items-center gap-3 text-xs text-zinc-600">
+          <div className="flex items-center gap-3 text-[10px] text-text-secondary font-mono uppercase tracking-tighter">
             <div className="flex items-center gap-1">
-              <Star size={12} />
+              <Star size={10} className="text-accent" fill="#000000" />
               <span>{repo.stars}</span>
             </div>
             <div className="flex items-center gap-1">
-              <GitBranch size={12} />
+              <GitBranch size={10} />
               <span>{repo.branch}</span>
             </div>
             <div className="flex items-center gap-1">
-              <Users size={12} />
-              <span>{stats.totalFiles} files</span>
+              <Users size={10} />
+              <span>{stats.totalFiles} entities</span>
             </div>
           </div>
         </div>
@@ -42,11 +42,11 @@ export function RepoStatus() {
         <button
           onClick={refreshRepository}
           disabled={isAnalyzing}
-          className="p-1 hover:bg-zinc-100 rounded transition-colors disabled:opacity-50"
+          className="w-8 h-8 flex items-center justify-center border arch-border bg-background hover:bg-surface rounded-sm transition-all disabled:opacity-50 text-text-secondary hover:text-accent arch-shadow-sm"
           title="Refresh repository analysis"
         >
           <RefreshCw 
-            size={14} 
+            size={12} 
             className={`${isAnalyzing ? 'animate-spin' : ''}`} 
           />
         </button>
