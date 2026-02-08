@@ -5,9 +5,32 @@ import { FlowDiagram } from "@/components/generative/FlowDiagram";
 import { FileSummary } from "@/components/generative/FileSummary";
 import { GuidanceCard } from "@/components/generative/GuidanceCard";
 import { CodeFlowGraph } from "@/components/generative/CodeFlowGraph";
+import { GenerativeTable } from "@/components/generative/GenerativeTable";
 import { z } from "zod";
 
 export const componentRegistry: TamboComponent[] = [
+  {
+    name: "GenerativeTable",
+    description:
+      "Displays structured data in a table format. Use when the user asks for a 'table', 'list', 'comparison', 'matrix', or 'grid' of data. Suitable for listing API endpoints, database schemas, configuration options, dependencies, or any structured data that fits in rows and columns.",
+    component: GenerativeTable,
+    propsSchema: z.object({
+      title: z.string().optional().default("DATA TABLE").describe("Title of the table"),
+      description: z.string().optional().describe("Optional description of what the table shows"),
+      columns: z.array(
+        z.object({
+          header: z.string().optional().default("").describe("Header text for the column"),
+          width: z.string().optional().describe("CSS width (e.g. '20%', '100px')"),
+          align: z.string().optional().default("left").describe("Text alignment for the column (left, center, right)"),
+        })
+      ).optional().default([]).describe("Column definitions"),
+      rows: z.array(
+        z.object({
+          values: z.array(z.string().optional().default("")).optional().default([]).describe("Array of cell values corresponding to the column order"),
+        })
+      ).optional().default([]).describe("Data rows for the table"),
+    }),
+  },
   {
     name: "ModuleCards",
     description:
@@ -27,15 +50,16 @@ export const componentRegistry: TamboComponent[] = [
       modules: z
         .array(
           z.object({
-            name: z.string().describe("Name of the module, e.g. 'Next.js Frontend', 'Node.js Backend'"),
-            description: z.string().describe("Brief description of what this module does"),
-            files: z.array(z.string()).describe("List of key files in this module"),
-            dependencies: z.array(z.string()).optional().describe("List of other modules this module depends on"),
-            color: z.string().optional().describe("Hex color code for the module tag"),
+            name: z.string().optional().default("Unknown Module").describe("Name of the module, e.g. 'Next.js Frontend', 'Node.js Backend'"),
+            description: z.string().optional().default("").describe("Brief description of what this module does"),
+            files: z.array(z.string()).optional().default([]).describe("List of key files in this module"),
+            dependencies: z.array(z.string()).optional().default([]).describe("List of other modules this module depends on"),
+            color: z.string().optional().default("#000000").describe("Hex color code for the module tag"),
             type: z.enum(['frontend', 'backend', 'database', 'config', 'tests', 'docs']).optional().describe("Module type for filtering"),
           })
         )
         .optional()
+        .nullable()
         .describe("Optional custom modules. If omitted, will use real repository analysis or fall back to mock data."),
     }),
   },
@@ -89,29 +113,32 @@ export const componentRegistry: TamboComponent[] = [
       columns: z
         .array(
           z.object({
-            title: z.string().describe("Column stage name, e.g. 'Entry Point', 'Initialization', 'Service Layer'"),
-            color: z.string().describe("Background color hex for the column header, e.g. '#FFD600' (yellow), '#bbdefb' (light blue), '#c8e6c9' (light green)"),
+            title: z.string().optional().default("Stage").describe("Column stage name, e.g. 'Entry Point', 'Initialization', 'Service Layer'"),
+            color: z.string().optional().default("#e0e0e0").describe("Background color hex for the column header, e.g. '#FFD600' (yellow), '#bbdefb' (light blue), '#c8e6c9' (light green)"),
             blocks: z.array(
               z.object({
-                id: z.string().describe("Unique ID for the block, e.g. 'main', 'startup', 'createServices'"),
-                label: z.string().describe("Label shown above code, e.g. 'private async startup()', 'main(): void'"),
-                code: z.string().describe("The actual code snippet to display. Use realistic code with function calls, try/catch, await, etc. Keep to 4-10 lines. Use \\n for newlines."),
-                highlights: z.array(z.string()).optional().describe("Function names or keywords to highlight in the code with a blue background, e.g. ['startup', 'createServices']"),
+                id: z.string().optional().default("block").describe("Unique ID for the block, e.g. 'main', 'startup', 'createServices'"),
+                label: z.string().optional().default("").describe("Label shown above code, e.g. 'private async startup()', 'main(): void'"),
+                code: z.string().optional().default("// No code provided").describe("The actual code snippet to display. Use realistic code with function calls, try/catch, await, etc. Keep to 4-10 lines. Use \\n for newlines."),
+                highlights: z.array(z.string()).optional().default([]).describe("Function names or keywords to highlight in the code with a blue background, e.g. ['startup', 'createServices']"),
                 description: z.string().optional().describe("Optional short explanation shown below the code block"),
               })
-            ).describe("Code blocks within this column. Each block shows a code snippet with optional highlights."),
+            ).optional().default([]).describe("Code blocks within this column. Each block shows a code snippet with optional highlights."),
           })
         )
+        .optional()
+        .default([])
         .describe("Columns representing stages in the code flow. Arrange left-to-right for the logical progression."),
       connections: z
         .array(
           z.object({
-            from: z.string().describe("ID of the source code block"),
-            to: z.string().describe("ID of the target code block"),
+            from: z.string().optional().default("").describe("ID of the source code block"),
+            to: z.string().optional().default("").describe("ID of the target code block"),
             label: z.string().optional().describe("Arrow label, e.g. 'calls', 'returns', 'awaits'"),
           })
         )
         .optional()
+        .default([])
         .describe("Arrows connecting code blocks to show the flow between them."),
     }),
   },
@@ -124,6 +151,7 @@ export const componentRegistry: TamboComponent[] = [
       filename: z
         .string()
         .optional()
+        .default("unknown.ts")
         .describe(
           "The filename to explain, e.g. 'login.ts', 'authMiddleware.ts', 'routes.ts'."
         ),
@@ -134,6 +162,18 @@ export const componentRegistry: TamboComponent[] = [
         .describe(
           "A comic-style title, e.g. 'FILE BREAKDOWN!' or 'INSIDE login.ts!'"
         ),
+      role: z
+        .string()
+        .optional()
+        .describe("The role of the file, e.g. 'Authentication Config', 'Helper Utility', 'Main Entry Point'"),
+      description: z
+        .string()
+        .optional()
+        .describe("A detailed explanation of what the file does, its key functions, and its importance in the project."),
+      importance: z
+        .enum(["Critical", "High", "Medium", "Low"])
+        .optional()
+        .describe("How important this file is to the overall project."),
     }),
   },
   {

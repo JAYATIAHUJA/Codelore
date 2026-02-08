@@ -18,7 +18,7 @@ interface Module {
 export async function POST(req: NextRequest) {
   try {
     const { url } = await req.json();
-    
+
     if (!url) {
       return NextResponse.json({ error: "No URL provided" }, { status: 400 });
     }
@@ -125,7 +125,7 @@ export async function POST(req: NextRequest) {
 function analyzeRepoStructure(files: GitHubFile[], fetchedConfigs: PromiseSettledResult<Response>[]): Module[] {
   const modules: Module[] = [];
   const filePaths = files.filter(f => f.type === "file").map(f => f.path);
-  
+
   // Detect project type and framework
   const hasNextJs = filePaths.some(p => p.includes("next.config") || p.includes("app/layout.tsx"));
   const hasReact = filePaths.some(p => p.endsWith(".jsx") || p.endsWith(".tsx"));
@@ -137,18 +137,18 @@ function analyzeRepoStructure(files: GitHubFile[], fetchedConfigs: PromiseSettle
 
   // Frontend Module
   if (hasReact || hasNextJs) {
-    const frontendFiles = filePaths.filter(p => 
-      p.includes("components/") || 
-      p.includes("pages/") || 
-      p.includes("app/") || 
-      p.endsWith(".tsx") || 
+    const frontendFiles = filePaths.filter(p =>
+      p.includes("components/") ||
+      p.includes("pages/") ||
+      p.includes("app/") ||
+      p.endsWith(".tsx") ||
       p.endsWith(".jsx") ||
       p.includes("public/")
     );
 
     modules.push({
       name: hasNextJs ? "Next.js Frontend" : "React Frontend",
-      description: hasNextJs 
+      description: hasNextJs
         ? "Next.js application with React components, pages, and routing"
         : "React application with components and client-side logic",
       files: frontendFiles.slice(0, 8),
@@ -160,9 +160,9 @@ function analyzeRepoStructure(files: GitHubFile[], fetchedConfigs: PromiseSettle
 
   // Backend Module  
   if (hasNode && hasExpress) {
-    const backendFiles = filePaths.filter(p => 
-      p.includes("api/") || 
-      p.includes("server/") || 
+    const backendFiles = filePaths.filter(p =>
+      p.includes("api/") ||
+      p.includes("server/") ||
       p.includes("routes/") ||
       p.includes("controllers/") ||
       p.includes("middleware/") ||
@@ -180,8 +180,8 @@ function analyzeRepoStructure(files: GitHubFile[], fetchedConfigs: PromiseSettle
       type: "backend"
     });
   } else if (hasPython) {
-    const pythonFiles = filePaths.filter(p => 
-      p.endsWith(".py") && 
+    const pythonFiles = filePaths.filter(p =>
+      p.endsWith(".py") &&
       !p.includes("__pycache__") &&
       !p.includes("venv/")
     );
@@ -196,7 +196,7 @@ function analyzeRepoStructure(files: GitHubFile[], fetchedConfigs: PromiseSettle
     });
   } else if (hasJava) {
     const javaFiles = filePaths.filter(p => p.endsWith(".java"));
-    
+
     modules.push({
       name: "Java Backend",
       description: "Java application with Spring Boot or other framework",
@@ -208,9 +208,9 @@ function analyzeRepoStructure(files: GitHubFile[], fetchedConfigs: PromiseSettle
   }
 
   // Database Module
-  const dbFiles = filePaths.filter(p => 
-    p.includes("prisma/") || 
-    p.includes("migrations/") || 
+  const dbFiles = filePaths.filter(p =>
+    p.includes("prisma/") ||
+    p.includes("migrations/") ||
     p.includes("schema/") ||
     p.includes("models/") ||
     p.includes("database/") ||
@@ -229,7 +229,7 @@ function analyzeRepoStructure(files: GitHubFile[], fetchedConfigs: PromiseSettle
   }
 
   // Configuration Module
-  const configPaths = filePaths.filter(p => 
+  const configPaths = filePaths.filter(p =>
     p.includes("config") ||
     p.endsWith(".config.js") ||
     p.endsWith(".config.ts") ||
@@ -254,9 +254,9 @@ function analyzeRepoStructure(files: GitHubFile[], fetchedConfigs: PromiseSettle
   }
 
   // Tests Module
-  const testFiles = filePaths.filter(p => 
-    p.includes("test") || 
-    p.includes("spec") || 
+  const testFiles = filePaths.filter(p =>
+    p.includes("test") ||
+    p.includes("spec") ||
     p.includes("__tests__") ||
     p.endsWith(".test.js") ||
     p.endsWith(".test.ts") ||
@@ -279,16 +279,10 @@ function analyzeRepoStructure(files: GitHubFile[], fetchedConfigs: PromiseSettle
 }
 
 function detectLanguages(files: GitHubFile[]): string[] {
-  const extensions = new Set<string>();
-  files.forEach(file => {
-    const ext = file.path.split('.').pop()?.toLowerCase();
-    if (ext) extensions.add(ext);
-  });
-
   const languageMap: Record<string, string> = {
     'js': 'JavaScript',
     'jsx': 'JavaScript',
-    'ts': 'TypeScript', 
+    'ts': 'TypeScript',
     'tsx': 'TypeScript',
     'py': 'Python',
     'java': 'Java',
@@ -301,9 +295,16 @@ function detectLanguages(files: GitHubFile[]): string[] {
     'rb': 'Ruby',
   };
 
-  return Array.from(extensions)
-    .map(ext => languageMap[ext])
-    .filter(Boolean);
+  const languages = new Set<string>();
+
+  files.forEach(file => {
+    const ext = file.path.split('.').pop()?.toLowerCase();
+    if (ext && languageMap[ext]) {
+      languages.add(languageMap[ext]);
+    }
+  });
+
+  return Array.from(languages);
 }
 
 function detectFrameworks(files: GitHubFile[]): string[] {
@@ -316,7 +317,7 @@ function detectFrameworks(files: GitHubFile[]): string[] {
   if (filePaths.some(p => p.includes("vue.config"))) frameworks.push("Vue.js");
   if (filePaths.some(p => p.includes("svelte.config"))) frameworks.push("Svelte");
   if (filePaths.some(p => p.includes("remix.config"))) frameworks.push("Remix");
-  
+
   // Backend frameworks
   if (filePaths.some(p => p.includes("express"))) frameworks.push("Express.js");
   if (filePaths.some(p => p.includes("fastify"))) frameworks.push("Fastify");
