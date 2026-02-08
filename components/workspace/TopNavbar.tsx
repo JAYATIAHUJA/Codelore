@@ -12,7 +12,7 @@ export function TopNavbar() {
   const { tabs, activeTabId, addTab, removeTab, switchTab } = useWorkspaceTabs();
 
   return (
-    <nav className="h-16 border-b arch-border bg-surface flex items-center justify-between px-6 z-50 sticky top-0">
+    <nav className="h-16 border-b arch-border bg-navbar-bg backdrop-blur-xl flex items-center justify-between px-6 z-50 sticky top-0">
       {/* Left: Branding & Tabs */}
       <div className="flex items-center gap-8">
         <Link href="/" className="flex items-center gap-2 group">

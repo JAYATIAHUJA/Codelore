@@ -34,28 +34,9 @@ export function GitHubInput() {
           value={url}
           onChange={(e) => setUrl(e.target.value)}
           placeholder="Enter GitHub repository URL..."
-          className="w-full pl-12 pr-36 py-4 bg-background border arch-border font-medium focus:border-accent/40 rounded-sm arch-shadow transition-all outline-none text-text-primary placeholder:text-text-secondary/50 placeholder:text-sm"
+          className="w-full pl-12 pr-4 py-5 bg-background border arch-border font-medium focus:border-accent/40 rounded-sm arch-shadow transition-all outline-none text-text-primary placeholder:text-text-secondary/50 placeholder:text-sm"
           disabled={isAnalyzing}
         />
-        <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-2">
-           <button
-             type="submit"
-             disabled={isAnalyzing || !url.trim()}
-             className="arch-btn-primary h-10 px-6 uppercase text-[10px] tracking-widest disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-           >
-             {isAnalyzing ? (
-               <>
-                  <Loader2 className="animate-spin" size={14} />
-                  <span>Scanning...</span>
-               </>
-             ) : (
-               <>
-                 <span>Analyze</span>
-                 <ArrowRight size={14} />
-               </>
-             )}
-           </button>
-        </div>
       </form>
 
       {error && (

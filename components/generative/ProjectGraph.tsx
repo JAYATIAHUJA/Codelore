@@ -72,6 +72,32 @@ const colorSchemes = {
         services: '#000000',
         routes: '#000000',
         controllers: '#000000'
+    },
+    minimal: {
+        frontend: '#64748b',
+        backend: '#64748b',
+        database: '#64748b',
+        api: '#64748b',
+        config: '#64748b',
+        tests: '#64748b',
+        entry: '#64748b',
+        utils: '#64748b',
+        services: '#64748b',
+        routes: '#64748b',
+        controllers: '#64748b'
+    },
+    colorful: {
+        frontend: '#3b82f6',
+        backend: '#10b981',
+        database: '#6366f1',
+        api: '#f59e0b',
+        config: '#6b7280',
+        tests: '#22c55e',
+        entry: '#fbbf24',
+        utils: '#8b5cf6',
+        services: '#ec4899',
+        routes: '#14b8a6',
+        controllers: '#f97316'
     }
 };
 
@@ -157,7 +183,7 @@ export function ProjectGraph({
                 const IconComponent = iconMap[node.type as keyof typeof iconMap] || Code;
                 const colors = colorSchemes[style.theme || 'modern'];
                 const nodeColor = node.style?.color || colors[node.type as keyof typeof colors] || '#666';
-                const nodeSize = node.style?.size || 'medium';
+                const nodeSize = (node.style?.size || 'medium') as keyof typeof sizeMap;
                 
                 const sizeMap = {
                     small: { width: 140, height: 80, fontSize: 12 },
