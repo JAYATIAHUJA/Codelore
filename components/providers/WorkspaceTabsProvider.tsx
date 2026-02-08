@@ -1,7 +1,7 @@
 "use client";
 
-import React, { createContext, useContext, useState, useCallback, ReactNode } from "react";
 import { RepoData } from "@/components/providers/RepoProvider";
+import { createContext, ReactNode, useCallback, useContext, useState } from "react";
 
 export interface WorkspaceTab {
   id: string;

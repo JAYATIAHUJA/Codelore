@@ -1,7 +1,7 @@
 "use client";
 
-import React from "react";
 import { TamboThreadProvider } from "@tambo-ai/react";
+import React from "react";
 import { ChatDock } from "./ChatDock";
 import { InfiniteCanvas } from "./InfiniteCanvas";
 

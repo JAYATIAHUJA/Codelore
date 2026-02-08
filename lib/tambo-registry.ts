@@ -4,9 +4,9 @@ import { FlowDiagram } from "@/components/generative/FlowDiagram";
 import { GenerativeTable } from "@/components/generative/GenerativeTable";
 import { GuidanceCard } from "@/components/generative/GuidanceCard";
 import { ModuleCards } from "@/components/generative/ModuleCards";
+import { ProjectGraph } from "@/components/generative/ProjectGraph";
 import { TreeView } from "@/components/generative/TreeView";
 import { type TamboComponent } from "@tambo-ai/react";
-import { ProjectGraph } from "@/components/generative/ProjectGraph";
 import { z } from "zod";
 
 export const componentRegistry: TamboComponent[] = [

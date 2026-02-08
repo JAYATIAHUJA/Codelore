@@ -1,9 +1,9 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { useState, useRef, useEffect } from "react";
-import { Maximize2, Minimize2, RotateCcw } from "lucide-react";
 import { useTamboThread } from "@tambo-ai/react";
+import { motion } from "framer-motion";
+import { Maximize2, Minimize2, RotateCcw } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 
 interface CanvasProps {
   children?: React.ReactNode;
