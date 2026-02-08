@@ -15,7 +15,7 @@ export default function RepoInput({ threadId }: RepoInputProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [status, setStatus] = useState("");
 
-  const { setInput, submit } = useTamboThreadInput(threadId);
+  const { setValue: setInput, submit } = useTamboThreadInput();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -72,10 +72,10 @@ ${s.configFiles.join("\n")}
 
 ### File types:
 ${Object.entries(s.filesByExtension as Record<string, number>)
-  .sort(([, a], [, b]) => (b as number) - (a as number))
-  .slice(0, 15)
-  .map(([ext, count]) => `${ext}: ${count} files`)
-  .join("\n")}`;
+              .sort(([, a], [, b]) => (b as number) - (a as number))
+              .slice(0, 15)
+              .map(([ext, count]) => `${ext}: ${count} files`)
+              .join("\n")}`;
 
           // Add key file contents
           if (data.keyFileContents && Object.keys(data.keyFileContents).length > 0) {

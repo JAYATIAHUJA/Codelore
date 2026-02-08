@@ -22,8 +22,8 @@ export default function ChatInterface({ threadId }: ChatInterfaceProps) {
   const [localMessages, setLocalMessages] = useState<ChatMessage[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const thread = useTamboThread(threadId);
-  const { setInput, submit } = useTamboThreadInput(threadId);
+  const thread = useTamboThread();
+  const { setValue: setInput, submit } = useTamboThreadInput();
 
   const threadMessages = thread?.thread?.messages || [];
   const hasGraph = threadMessages.length >= 2;
@@ -104,11 +104,10 @@ User's question: ${userQ}`;
                 </div>
               )}
               <div
-                className={`max-w-[80%] rounded-lg px-3 py-2 text-sm ${
-                  msg.role === "user"
+                className={`max-w-[80%] rounded-lg px-3 py-2 text-sm ${msg.role === "user"
                     ? "bg-primary text-primary-foreground"
                     : "bg-muted"
-                }`}
+                  }`}
               >
                 <p className="whitespace-pre-wrap">{msg.content}</p>
               </div>
