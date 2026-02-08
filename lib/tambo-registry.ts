@@ -140,7 +140,7 @@ export const componentRegistry: TamboComponent[] = [
         z.object({
           id: z.string().describe("Unique ID for the node"),
           label: z.string().describe("Display label for the node"),
-          type: z.enum(["frontend", "backend", "database", "api", "config", "tests", "entry", "utils", "services", "routes", "controllers"]).describe("Type of module for icon and color mapping"),
+          type: z.enum(["frontend", "backend", "database", "api", "config", "tests", "entry", "utils", "services", "routes", "controllers", "middleware", "data", "external"]).describe("Type of module for icon and color mapping"),
           description: z.string().nullish().optional().describe("Brief description of what this module does"),
           files: z.array(z.string()).nullish().optional().describe("Key files in this module"),
           importance: z.enum(["high", "medium", "low"]).nullish().optional().describe("Importance level for visual emphasis"),
