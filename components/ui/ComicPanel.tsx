@@ -9,13 +9,12 @@ interface ComicPanelProps {
   className?: string;
 }
 
-export function ComicPanel({ title, color = "#FFD600", children, className = "" }: ComicPanelProps) {
+export function ComicPanel({ title, color = "var(--accent)", children, className = "" }: ComicPanelProps) {
   return (
-    <div className={`comic-enter relative overflow-hidden rounded-lg comic-border-thick bg-white ${className}`}>
-      <div className="halftone" />
+    <div className={`relative overflow-hidden arch-border bg-surface rounded-sm arch-shadow ${className}`}>
       {title && (
         <div
-          className="relative z-10 px-4 py-2 font-[var(--font-bangers)] text-xl tracking-wider text-black border-b-4 border-black"
+          className="relative z-10 px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-[#000000] border-b arch-border font-mono"
           style={{ backgroundColor: color }}
         >
           {title}

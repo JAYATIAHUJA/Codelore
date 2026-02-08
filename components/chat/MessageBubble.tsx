@@ -14,20 +14,26 @@ export function MessageBubble({ role, content }: MessageBubbleProps) {
   if (role === "system") return null; // Hide system messages
 
   return (
-    <div className={`flex ${isUser ? "justify-end" : "justify-start"} comic-enter`}>
-      <div className={`max-w-[80%] ${isUser ? "speech-bubble" : "speech-bubble speech-bubble-ai"}`}>
-        <span className="text-xs font-bold uppercase text-zinc-500 block mb-1">
-          {label}
-        </span>
-        <div className="text-sm leading-relaxed">
+    <div className={`flex flex-col ${isUser ? "items-end" : "items-start"} mb-4`}>
+      <span className={`text-[9px] font-bold uppercase tracking-widest mb-1.5 ${isUser ? "text-accent" : "text-text-secondary"}`}>
+        {label}
+      </span>
+      <div 
+        className={`max-w-[90%] p-3.5 rounded-sm border arch-border ${
+          isUser 
+          ? "bg-accent text-white arch-shadow" 
+          : "bg-background text-text-primary arch-shadow-sm"
+        }`}
+      >
+        <div className="text-xs leading-relaxed font-medium">
           {Array.isArray(content) ? (
             content.map((part, i) =>
               part.type === "text" ? <p key={i}>{part.text}</p> : null
             )
           ) : typeof content === 'object' && content !== null ? (
-            <p>{JSON.stringify(content)}</p>
+            <pre className="whitespace-pre-wrap font-mono text-[10px]">{JSON.stringify(content, null, 2)}</pre>
           ) : (
-            <p>{String(content)}</p>
+            <p className="whitespace-pre-wrap">{String(content)}</p>
           )}
         </div>
       </div>

@@ -1,25 +1,19 @@
 import type { Metadata } from "next";
-import { Comic_Neue, Bangers } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import { TamboProviderWrapper } from "@/components/providers/TamboProviderWrapper";
 import { RepoProvider } from "@/components/providers/RepoProvider";
+import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { WorkspaceTabsProvider } from "@/components/providers/WorkspaceTabsProvider";
 
-const comicNeue = Comic_Neue({
+const inter = Inter({
   subsets: ["latin"],
-  weight: ["300", "400", "700"],
-  variable: "--font-comic-neue",
-});
-
-const bangers = Bangers({
-  subsets: ["latin"],
-  weight: "400",
-  variable: "--font-bangers",
+  variable: "--font-inter",
 });
 
 export const metadata: Metadata = {
-  title: "CodeLore | Generative Code Intelligence Workspace",
-  description: "Experience the next-generation developer workspace where AI manifestations build your IDE on-the-fly.",
+  title: "CodeLore | Talk To Your Codebase",
+  description: "CodeLore connects to your GitHub repository and transforms complex architectures into visual, interactive intelligence maps powered by generative UI.",
 };
 
 export default function RootLayout({
@@ -28,15 +22,22 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
-        className={`${comicNeue.variable} ${bangers.variable} font-[var(--font-comic-neue)] antialiased`}
+        className={`${inter.variable} font-sans antialiased`}
       >
-        <RepoProvider>
-          <WorkspaceTabsProvider>
-            <TamboProviderWrapper>{children}</TamboProviderWrapper>
-          </WorkspaceTabsProvider>
-        </RepoProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="light"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <RepoProvider>
+            <WorkspaceTabsProvider>
+              <TamboProviderWrapper>{children}</TamboProviderWrapper>
+            </WorkspaceTabsProvider>
+          </RepoProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

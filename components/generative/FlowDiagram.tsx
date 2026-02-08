@@ -9,45 +9,45 @@ interface FlowDiagramProps {
 }
 
 const stepColors = [
-  "#7b1fa2", // purple - frontend
-  "#1565c0", // blue - api
-  "#1565c0", // blue
-  "#43a047", // green - db
-  "#e53935", // red - auth
-  "#e53935", // red
-  "#7b1fa2", // purple - frontend
+  "var(--accent)", // aquamarine
+  "var(--accent)", 
+  "var(--accent)",
+  "var(--accent)",
+  "var(--accent)",
+  "var(--accent)",
+  "var(--accent)",
 ];
 
 export function FlowDiagram({ title = "AUTH FLOW" }: FlowDiagramProps) {
   return (
-    <ComicPanel title={title} color="#e53935">
+    <ComicPanel title={title} color="var(--accent)">
       <div className="flex flex-col items-center gap-0 py-4">
         {authFlowSteps.map((step, i) => {
           const connection = authFlowConnections.find((c) => c.from === step.id);
           return (
             <React.Fragment key={step.id}>
               {/* Step Node */}
-              <div className="comic-enter flex items-center gap-4 w-full max-w-md">
+              <div className="flex items-center gap-4 w-full max-w-sm">
                 <div
-                  className="flex-shrink-0 w-10 h-10 rounded-full border-3 border-black flex items-center justify-center text-white font-bold text-sm"
-                  style={{ backgroundColor: stepColors[i], borderWidth: 3 }}
+                  className="flex-shrink-0 w-8 h-8 rounded-sm arch-border flex items-center justify-center text-[#000000] font-mono font-bold text-xs"
+                  style={{ backgroundColor: stepColors[i] }}
                 >
                   {step.id}
                 </div>
                 <div className="flow-node flex-1">
-                  <div className="font-[var(--font-bangers)] text-base tracking-wide">{step.label}</div>
-                  <div className="text-xs text-zinc-500 font-mono">{step.file}</div>
-                  <div className="text-xs text-zinc-600 mt-1">{step.description}</div>
+                  <div className="text-[11px] font-bold uppercase tracking-widest text-text-primary">{step.label}</div>
+                  <div className="text-[9px] text-text-secondary font-mono opacity-60 uppercase">{step.file}</div>
+                  <div className="text-[10px] text-text-secondary mt-1 leading-relaxed">{step.description}</div>
                 </div>
               </div>
               {/* Arrow connector */}
               {connection && (
                 <div className="flex flex-col items-center my-1">
-                  <div className="w-0.5 h-6 bg-black" />
-                  <div className="text-xs font-bold text-zinc-500 -my-1">
+                  <div className="w-[1px] h-6 bg-border" />
+                  <div className="text-[9px] font-bold text-accent uppercase tracking-tighter -my-1">
                     {connection.label} ▼
                   </div>
-                  <div className="w-0.5 h-4 bg-black" />
+                  <div className="w-[1px] h-4 bg-border" />
                 </div>
               )}
             </React.Fragment>

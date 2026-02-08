@@ -1,154 +1,131 @@
 "use client";
 
-import { motion, AnimatePresence } from "framer-motion";
-import { useState, useEffect } from "react";
-import { ArrowRight, Terminal } from "lucide-react";
+import { motion } from "framer-motion";
+import { ArrowRight } from "lucide-react";
 import Link from "next/link";
-
-const MOCKUP_STATES = [
-  { id: "all", label: "Project Overview", color: "bg-brutal-yellow" },
-  { id: "auth", label: "Auth Flow", color: "bg-brutal-red" },
-  { id: "backend", label: "Backend Structure", color: "bg-brutal-blue" },
-];
+import { SnippetCard } from "@/components/ui/SnippetCard";
 
 export function HeroSection() {
-  const [index, setIndex] = useState(0);
-  const [typedText, setTypedText] = useState("");
-  const targetTexts = ["Only auth flow", "Show project structure", "Explain backend"];
-
-  useEffect(() => {
-    let charIndex = 0;
-    const interval = setInterval(() => {
-      if (charIndex <= targetTexts[index % targetTexts.length].length) {
-        setTypedText(targetTexts[index % targetTexts.length].slice(0, charIndex));
-        charIndex++;
-      } else {
-        setTimeout(() => {
-          setIndex((prev) => prev + 1);
-          charIndex = 0;
-        }, 2000);
-        clearInterval(interval);
-      }
-    }, 100);
-    return () => clearInterval(interval);
-  }, [index]);
-
   return (
-    <section className="relative min-h-screen flex flex-col lg:flex-row items-center justify-center p-6 lg:p-20 overflow-hidden bg-brutal-white">
-      {/* Background Graphic Element */}
-      <div className="absolute top-(-10%) right-(-10%) w-96 h-96 bg-brutal-blue opacity-10 rotate-12 brutal-border -z-10" />
+    <section className="relative min-h-[90vh] flex flex-col items-center justify-center pt-48 pb-20 px-6 bg-background overflow-hidden">
+      {/* Decorative architectural grid background */}
+      <div className="absolute inset-0 z-0 pointer-events-none opacity-[0.03]" 
+           style={{ backgroundImage: 'linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
       
-      <div className="flex-1 z-10 space-y-8">
+      <div className="arch-container relative z-10 flex flex-col items-center text-center">
         <motion.div
-          initial={{ x: -100, opacity: 0 }}
-          animate={{ x: 0, opacity: 1 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-          className="space-y-2"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="space-y-6 max-w-4xl"
         >
-          <span className="bg-brutal-black text-brutal-white px-3 py-1 font-bold text-sm tracking-widest uppercase">
-            Powered by Tambo
-          </span>
-          <h1 className="text-8xl lg:text-[12rem] font-[var(--font-bangers)] leading-[0.85] tracking-tighter text-brutal-black">
-            CODE<br />LORE
-          </h1>
-          <p className="text-3xl lg:text-5xl font-bold italic text-brutal-black uppercase">
-            Talk To Your Codebase.
-          </p>
-        </motion.div>
-
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-          className="max-w-xl text-xl font-medium leading-relaxed"
-        >
-          Stop clicking folders. Stop searching files. <br />
-          Experience a UI that dynamically rebuilds itself based on your intent. 
-          The actual layout changes while you chat.
-        </motion.p>
-
-        <motion.div
-          initial={{ y: 50, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.7 }}
-          className="flex flex-wrap gap-4 items-center"
-        >
-          <Link href="/interface">
-            <button className="brutal-btn text-xl flex items-center gap-2 group">
-              Enter The Interface <ArrowRight className="group-hover:translate-x-1 transition-transform" />
-            </button>
-          </Link>
-          <button className="brutal-btn-cyan px-8">
-            Meet Tambo
-          </button>
-          <button className="brutal-btn-pink-square">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M10.8425 24V0H13.1575V24H10.8425ZM0 13.1664V10.8336H24V13.1664H0Z" fill="black"/>
-            </svg>
-          </button>
-        </motion.div>
-      </div>
-
-      <div className="flex-1 w-full lg:w-1/2 mt-20 lg:mt-0 relative">
-        <motion.div
-          initial={{ scale: 0.8, rotate: -5, opacity: 0 }}
-          animate={{ scale: 1, rotate: 0, opacity: 1 }}
-          transition={{ duration: 1, type: "spring" }}
-          className="relative bg-white brutal-border-thick brutal-shadow w-full aspect-[4/3] flex flex-col overflow-hidden"
-        >
-          {/* Mockup Toolbar */}
-          <div className="h-12 border-b-4 border-black bg-zinc-100 flex items-center px-4 justify-between">
-            <div className="flex gap-2">
-              <div className="w-3 h-3 rounded-full bg-brutal-red brutal-border" />
-              <div className="w-3 h-3 rounded-full bg-brutal-yellow brutal-border" />
-              <div className="w-3 h-3 rounded-full bg-brutal-blue brutal-border" />
-            </div>
-            <div className="bg-white border-2 border-black px-2 py-0.5 text-xs font-mono font-bold">
-              localhost:3000/codelore
-            </div>
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border arch-border bg-surface-elevated/50 text-[10px] font-bold tracking-widest uppercase text-text-secondary">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-accent"></span>
+            </span>
+            Architecture Intelligence
           </div>
 
-          {/* Mockup Content */}
-          <div className="flex-1 p-6 relative flex flex-col">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={index % MOCKUP_STATES.length}
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                className="flex-1 space-y-4"
-              >
-                <div className={`h-8 w-48 brutal-border-thick ${MOCKUP_STATES[index % MOCKUP_STATES.length].color}`} />
-                <div className="grid grid-cols-2 gap-4">
-                  {[1, 2, 3, 4].map((i) => (
-                    <div key={i} className="h-24 brutal-border bg-zinc-50 p-3 flex flex-col justify-end">
-                      <div className="h-2 w-1/2 bg-zinc-300" />
-                    </div>
-                  ))}
-                </div>
-              </motion.div>
-            </AnimatePresence>
+          <h1 className="text-5xl md:text-8xl font-bold tracking-tighter text-text-primary leading-[1.1] md:leading-[0.95]">
+            Talk To Your <br />
+            <span className="text-accent italic font-light tracking-tight">Codebase.</span>
+          </h1>
 
-            {/* Simulated Input */}
-            <div className="mt-auto relative">
-              <div className="brutal-border-thick bg-white p-3 flex items-center gap-3">
-                <Terminal size={20} className="text-zinc-400" />
-                <span className="font-mono text-lg font-bold">
-                  {typedText}
-                  <motion.span
-                    animate={{ opacity: [1, 0] }}
-                    transition={{ repeat: Infinity, duration: 0.8 }}
-                    className="inline-block w-2 h-6 bg-brutal-black ml-1 align-middle"
-                  />
-                </span>
+          <p className="max-w-2xl mx-auto text-lg md:text-xl text-text-secondary font-medium leading-relaxed">
+            CodeLore connects to your GitHub repository and transforms complex architectures into visual, interactive intelligence maps powered by generative UI.
+          </p>
+
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-6 pt-6">
+            <Link href="/interface">
+              <button className="brand-btn-primary group">
+                <span className="text-[13px] font-bold uppercase tracking-[0.2em] font-mono">Get Started For Free</span>
+                <div className="brand-btn-icon">
+                  <ArrowRight className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
+                </div>
+              </button>
+            </Link>
+            <Link href="#demo">
+              <button className="btn-expand h-14 px-8 flex items-center justify-center">
+                View Demo
+              </button>
+            </Link>
+          </div>
+        </motion.div>
+
+        {/* Elegant UI Mockup Container */}
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className="mt-20 w-full max-w-5xl arch-border bg-surface arch-shadow p-2 rounded-sm overflow-hidden"
+        >
+          <div className="bg-text-primary/5 arch-border border-l-0 border-r-0 border-t-0 p-3 flex items-center gap-2">
+            <div className="flex gap-1.5">
+              <div className="w-3 h-3 rounded-full bg-text-secondary/20" />
+              <div className="w-3 h-3 rounded-full bg-text-secondary/20" />
+              <div className="w-3 h-3 rounded-full bg-text-secondary/20" />
+            </div>
+            <div className="ml-4 px-3 py-1 bg-surface-elevated border arch-border rounded text-[10px] font-mono text-text-secondary flex-1 max-w-xs text-left">
+              codelore.ai/workspace/repo-analysis
+            </div>
+          </div>
+          
+          <div className="aspect-[16/9] bg-background flex">
+            {/* Mock Sidebar */}
+            <div className="w-16 md:w-48 border-r arch-border h-full p-4 hidden md:flex flex-col gap-6">
+              <div className="h-4 w-24 bg-text-primary/10 rounded" />
+              <div className="space-y-3">
+                <div className="h-3 w-32 bg-text-primary/5 rounded" />
+                <div className="h-3 w-28 bg-text-primary/5 rounded" />
+                <div className="h-3 w-36 bg-text-primary/5 rounded" />
+              </div>
+            </div>
+            
+            {/* Mock Canvas Area */}
+            <div className="flex-1 p-8 overflow-hidden relative">
+              <div className="absolute inset-0 opacity-[0.05]" 
+                   style={{ backgroundImage: 'radial-gradient(circle, var(--border) 1px, transparent 1px)', backgroundSize: '16px 16px' }} />
+              
+              <div className="relative grid grid-cols-2 gap-8 h-full">
+                <div className="arch-border bg-card-bg p-4 h-3/4 flex flex-col gap-3">
+                  <div className="h-4 w-20 bg-accent/20 rounded" />
+                  <div className="h-2 w-full bg-text-secondary/10 rounded" />
+                  <div className="h-2 w-full bg-text-secondary/10 rounded" />
+                  <div className="h-2 w-2/3 bg-text-secondary/10 rounded" />
+                  <div className="mt-auto h-24 w-full bg-text-secondary/5 rounded border arch-border border-dashed" />
+                </div>
+                <div className="arch-border bg-card-bg p-4 h-full flex flex-col gap-3 translate-y-8">
+                  <div className="h-4 w-24 bg-text-secondary/20 rounded" />
+                  <div className="h-2 w-full bg-text-secondary/10 rounded" />
+                  <div className="h-2 w-3/4 bg-text-secondary/10 rounded" />
+                  <div className="mt-4 grid grid-cols-2 gap-2">
+                    <div className="h-12 bg-text-secondary/5 rounded border arch-border" />
+                    <div className="h-12 bg-text-secondary/5 rounded border arch-border" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Chat Dock Mockup Overlay */}
+              <div className="absolute bottom-6 left-1/2 -translate-x-1/2 w-2/3 h-14 bg-surface arch-border arch-shadow flex items-center px-4 gap-4">
+                <div className="w-8 h-8 rounded-full bg-accent/10 flex items-center justify-center text-accent text-xs font-bold">CL</div>
+                <div className="text-xs text-text-secondary font-mono whitespace-nowrap overflow-hidden">"Explain the entry point flow..."</div>
+                <div className="ml-auto w-6 h-6 bg-text-secondary/10 rounded" />
               </div>
             </div>
           </div>
         </motion.div>
-        
-        {/* Floating Accents */}
-        <div className="absolute -top-6 -right-6 w-16 h-16 bg-brutal-yellow brutal-border rotate-12 -z-10" />
-        <div className="absolute -bottom-10 -left-10 w-24 h-24 bg-brutal-red brutal-border -rotate-6 -z-10" />
+
+        {/* NPM Snippet Section */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.4 }}
+          className="mt-12"
+        >
+          <SnippetCard />
+        </motion.div>
       </div>
     </section>
   );
