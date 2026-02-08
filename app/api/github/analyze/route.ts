@@ -152,31 +152,76 @@ function analyzeRepoStructure(files: GitHubFile[], fetchedConfigs: PromiseSettle
         ? "Next.js application with React components, pages, and routing"
         : "React application with components and client-side logic",
       files: frontendFiles.slice(0, 8),
-      dependencies: hasNode ? ["Node.js Backend", "API Layer"] : [],
+      dependencies: hasNode ? ["Node.js Backend", "API Layer", "Routes"] : [],
       color: "#61dafb",
       type: "frontend"
     });
   }
 
-  // Backend Module  
+  // Backend Analysis - Granular Breakdown
   if (hasNode && hasExpress) {
-    const backendFiles = filePaths.filter(p =>
-      p.includes("api/") ||
-      p.includes("server/") ||
-      p.includes("routes/") ||
-      p.includes("controllers/") ||
-      p.includes("middleware/") ||
-      p === "server.js" ||
-      p === "app.js" ||
-      p === "index.js"
-    );
+    // 1. Routes
+    const routeFiles = filePaths.filter(p => p.includes("routes/") || p.includes("api/"));
+    if (routeFiles.length > 0) {
+      modules.push({
+        name: "Routes",
+        description: "API endpoints and route definitions",
+        files: routeFiles.slice(0, 8),
+        dependencies: ["Controllers", "Middleware"], // Logical flow
+        color: "#4caf50",
+        type: "backend"
+      });
+    }
 
+    // 2. Controllers
+    const controllerFiles = filePaths.filter(p => p.includes("controllers/"));
+    if (controllerFiles.length > 0) {
+      modules.push({
+        name: "Controllers",
+        description: "Request handlers and logic orchestration",
+        files: controllerFiles.slice(0, 8),
+        dependencies: ["Services"],
+        color: "#8bc34a",
+        type: "backend"
+      });
+    }
+
+    // 3. Services
+    const serviceFiles = filePaths.filter(p => p.includes("services/"));
+    if (serviceFiles.length > 0) {
+      modules.push({
+        name: "Services",
+        description: "Business logic and data processing",
+        files: serviceFiles.slice(0, 8),
+        dependencies: ["Database", "Utils"],
+        color: "#cddc39",
+        type: "backend"
+      });
+    }
+
+    // 4. Middleware
+    const middlewareFiles = filePaths.filter(p => p.includes("middleware/"));
+    if (middlewareFiles.length > 0) {
+      modules.push({
+        name: "Middleware",
+        description: "Request processing (auth, logging, validation)",
+        files: middlewareFiles.slice(0, 8),
+        dependencies: [],
+        color: "#ffc107",
+        type: "backend"
+      });
+    }
+
+    // 5. Entry Point (Fallback for general backend files)
+    const entryFiles = filePaths.filter(p =>
+      p === "server.js" || p === "app.js" || p === "index.js" || p === "main.ts"
+    );
     modules.push({
-      name: "Node.js Backend",
-      description: "Express.js server with API routes, middleware, and business logic",
-      files: backendFiles.slice(0, 8),
-      dependencies: filePaths.some(p => p.includes("prisma") || p.includes("mongoose")) ? ["Database"] : [],
-      color: "#68a063",
+      name: "Entry Point",
+      description: "Application entry point and server startup",
+      files: entryFiles,
+      dependencies: ["Routes", "Middleware", "Config"],
+      color: "#607d8b",
       type: "backend"
     });
   } else if (hasPython) {
@@ -190,7 +235,7 @@ function analyzeRepoStructure(files: GitHubFile[], fetchedConfigs: PromiseSettle
       name: "Python Backend",
       description: "Python application with Flask/Django or FastAPI framework",
       files: pythonFiles.slice(0, 8),
-      dependencies: [],
+      dependencies: ["Database"],
       color: "#3776ab",
       type: "backend"
     });
@@ -201,7 +246,7 @@ function analyzeRepoStructure(files: GitHubFile[], fetchedConfigs: PromiseSettle
       name: "Java Backend",
       description: "Java application with Spring Boot or other framework",
       files: javaFiles.slice(0, 8),
-      dependencies: [],
+      dependencies: ["Database"],
       color: "#f89820",
       type: "backend"
     });
@@ -214,6 +259,7 @@ function analyzeRepoStructure(files: GitHubFile[], fetchedConfigs: PromiseSettle
     p.includes("schema/") ||
     p.includes("models/") ||
     p.includes("database/") ||
+    p.includes("entities/") ||
     p.includes(".sql")
   );
 
@@ -244,8 +290,8 @@ function analyzeRepoStructure(files: GitHubFile[], fetchedConfigs: PromiseSettle
 
   if (configPaths.length > 0) {
     modules.push({
-      name: "Configuration",
-      description: "Project configuration files, environment setup, and build tools",
+      name: "Config",
+      description: "App configuration and environment settings",
       files: configPaths.slice(0, 8),
       dependencies: [],
       color: "#ff9500",
@@ -253,7 +299,20 @@ function analyzeRepoStructure(files: GitHubFile[], fetchedConfigs: PromiseSettle
     });
   }
 
-  // Tests Module
+  // Utils / Shared
+  const utilFiles = filePaths.filter(p => p.includes("utils/") || p.includes("helpers/") || p.includes("lib/"));
+  if (utilFiles.length > 0) {
+    modules.push({
+      name: "Utils",
+      description: "Shared utility functions and helpers",
+      files: utilFiles.slice(0, 8),
+      dependencies: [],
+      color: "#9e9e9e",
+      type: "backend"
+    });
+  }
+
+  // Tests
   const testFiles = filePaths.filter(p =>
     p.includes("test") ||
     p.includes("spec") ||
@@ -267,9 +326,9 @@ function analyzeRepoStructure(files: GitHubFile[], fetchedConfigs: PromiseSettle
   if (testFiles.length > 0) {
     modules.push({
       name: "Tests",
-      description: "Unit tests, integration tests, and test utilities",
+      description: "Test suites",
       files: testFiles.slice(0, 8),
-      dependencies: [],
+      dependencies: ["Routes", "Services"],
       color: "#22c55e",
       type: "tests"
     });

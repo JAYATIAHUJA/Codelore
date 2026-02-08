@@ -3,6 +3,11 @@
 import { ChatInput } from "@/components/chat/ChatInput";
 import { LoadingDots } from "@/components/chat/LoadingDots";
 import { MessageBubble } from "@/components/chat/MessageBubble";
+import { Target, MoreHorizontal, Zap } from "lucide-react";
+import { ChatInput } from "@/components/chat/ChatInput";
+import { LoadingDots } from "@/components/chat/LoadingDots";
+import { MessageBubble } from "@/components/chat/MessageBubble";
+import { useRef, useEffect, useMemo } from "react";
 import { useRepo } from "@/components/providers/RepoProvider";
 import { useTamboThread } from "@tambo-ai/react";
 import { MoreHorizontal, Target, Zap } from "lucide-react";
@@ -15,7 +20,7 @@ export function ChatDock() {
 
   const { thread, sendThreadMessage, isIdle } = useTamboThread();
 
-  const messages = thread?.messages ?? [];
+  const messages = useMemo(() => thread?.messages ?? [], [thread?.messages]);
   const sendMessage = sendThreadMessage;
   const isLoading = !isIdle;
 
@@ -66,6 +71,18 @@ CRITICAL RULES — ALWAYS follow these:
 2. When I ask for "architecture" or "modules" or "explain project" → render ModuleCards (it auto-reads repo data)
 3. When I ask for ANY flow, lifecycle, trace, sequence, or "how does X work" → render CodeFlowGraph with columns of code blocks and connections. NEVER answer flow questions with plain text. ALWAYS generate the visual CodeFlowGraph component with realistic code snippets based on the files you can see.
 4. Do NOT generate fake/mock data. Use the actual file paths and structure above to generate realistic code.`;
+IMPORTANT: The repository data is already loaded. When I ask for "folder structure" or "file tree", render the TreeView component — it will automatically read the real file data from context. When I ask for "architecture" or "modules", render ModuleCards — it will automatically show the detected modules.
+
+For GRAPH VISUALIZATIONS: Use the enhanced ProjectGraph component to create intelligent, interactive graphs. You can:
+- Create custom nodes with specific types (frontend, backend, database, api, config, tests, entry, utils, services, routes, controllers)
+- Define edges with relationship types (import, data-flow, api-call, dependency)
+- Control layout (horizontal/vertical/radial, spacing, algorithm)
+- Apply themes (modern, brutal, minimal, colorful)
+- Add animations and backgrounds
+
+The ProjectGraph component automatically handles icon mapping, color schemes, and intelligent layout based on the repository structure. Use it for requests like "show project graph", "visualize architecture", "create dependency map", etc.
+
+Do NOT generate fake/mock data. The components pull real data from the connected repository.`;
 
       sendMessage(contextMessage);
       hasSentContext.current = true;
@@ -140,7 +157,7 @@ CRITICAL RULES — ALWAYS follow these:
 
         {messages.map((msg) => (
           <div key={msg.id} className="space-y-1">
-            <MessageBubble role={msg.role} content={msg.content} />
+            <MessageBubble role={msg.role} content={Array.isArray(msg.content) ? msg.content.map(part => 'text' in part ? part.text : '').join('') : msg.content} />
           </div>
         ))}
 

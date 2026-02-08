@@ -6,6 +6,7 @@ import { GuidanceCard } from "@/components/generative/GuidanceCard";
 import { ModuleCards } from "@/components/generative/ModuleCards";
 import { TreeView } from "@/components/generative/TreeView";
 import { type TamboComponent } from "@tambo-ai/react";
+import { ProjectGraph } from "@/components/generative/ProjectGraph";
 import { z } from "zod";
 
 export const componentRegistry: TamboComponent[] = [
@@ -118,6 +119,56 @@ export const componentRegistry: TamboComponent[] = [
         .any()
         .optional()
         .describe("Array of arrows between blocks. Each has: from (block ID), to (block ID), label? (string)"),
+    }),
+  },
+  {
+    name: "ProjectGraph",
+    description:
+      "Creates an intelligent, interactive graph visualization of the entire project structure with AI-driven layout, styling, and relationship analysis. Use when user asks to 'visualize the project', 'show project graph', 'create architecture diagram', 'show dependencies', or 'map the codebase'. AI can specify nodes, edges, layout, and styling for optimal visualization.",
+    component: ProjectGraph,
+    propsSchema: z.object({
+      title: z.string().optional().default("PROJECT MAP").describe("Title of the graph, e.g. 'PROJECT MAP', 'ARCHITECTURE DIAGRAM', 'DEPENDENCY GRAPH'"),
+      initialNodes: z.array(
+        z.object({
+          id: z.string().describe("Unique ID for the node"),
+          label: z.string().describe("Display label for the node"),
+          type: z.enum(["frontend", "backend", "database", "api", "config", "tests", "entry", "utils", "services", "routes", "controllers"]).describe("Type of module for icon and color mapping"),
+          description: z.string().optional().describe("Brief description of what this module does"),
+          files: z.array(z.string()).optional().describe("Key files in this module"),
+          importance: z.enum(["high", "medium", "low"]).optional().describe("Importance level for visual emphasis"),
+          position: z.object({ x: z.number().default(0), y: z.number().default(0) }).optional().describe("X/Y coordinates - if not provided, AI will auto-layout"),
+          style: z.object({
+            color: z.string().optional().describe("Custom color override"),
+            icon: z.string().optional().describe("Custom icon name"),
+            size: z.enum(["small", "medium", "large"]).optional().default("medium").describe("Node size"),
+          }).optional().describe("Visual styling options"),
+        })
+      ).optional().default([]).describe("Nodes in the graph - AI can create these based on repository analysis"),
+      initialEdges: z.array(
+        z.object({
+          id: z.string().describe("Unique ID for the edge"),
+          source: z.string().describe("ID of the source node"),
+          target: z.string().describe("ID of the target node"),
+          label: z.string().optional().describe("Label on the connection line"),
+          type: z.enum(["import", "data-flow", "api-call", "dependency"]).optional().default("dependency").describe("Type of relationship for styling"),
+          animated: z.boolean().optional().default(true).describe("Whether the edge should be animated"),
+          style: z.object({
+            color: z.string().optional().describe("Custom edge color"),
+            width: z.number().optional().default(2).describe("Edge thickness"),
+            dashArray: z.string().optional().describe("Dash pattern for dashed lines"),
+          }).optional().describe("Edge styling options"),
+        })
+      ).optional().default([]).describe("Connections between nodes - AI determines relationships"),
+      layout: z.object({
+        direction: z.enum(["horizontal", "vertical", "radial"]).optional().default("horizontal").describe("Layout direction"),
+        spacing: z.number().optional().default(350).describe("Spacing between nodes"),
+        algorithm: z.enum(["hierarchical", "force", "circular"]).optional().default("hierarchical").describe("Layout algorithm to use"),
+      }).optional().describe("Layout configuration for optimal node arrangement"),
+      style: z.object({
+        theme: z.enum(["modern", "brutal", "minimal", "colorful"]).optional().default("modern").describe("Visual theme - modern has gradients and shadows, brutal has black borders"),
+        background: z.enum(["grid", "dots", "solid"]).optional().default("dots").describe("Background pattern"),
+        animations: z.boolean().optional().default(true).describe("Enable animations and transitions"),
+      }).optional().describe("Overall visual styling and theme"),
     }),
   },
   {

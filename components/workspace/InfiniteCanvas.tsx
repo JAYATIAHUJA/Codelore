@@ -159,7 +159,7 @@ export function CanvasNode({ id, initialX, initialY, children }: { id: string; i
         </div>
 
         {/* Content */}
-        <div className="brutal-border bg-white shadow-[8px_8px_0px_rgba(0,0,0,0.1)] hover:shadow-brutal-shadow transition-shadow">
+        <div className="relative">
           {children}
         </div>
       </div>
