@@ -64,10 +64,12 @@ export function InfiniteCanvas({ children }: CanvasProps) {
   return (
     <div
       ref={canvasRef}
-      className="flex-1 bg-zinc-50 overflow-hidden relative"
+      className="flex-1 bg-background overflow-hidden relative"
       style={{
-        backgroundImage: `radial-gradient(circle, #e5e7eb 1px, transparent 1px)`,
-        backgroundSize: "24px 24px",
+        backgroundImage: `radial-gradient(circle, var(--text-primary) 1px, transparent 1px)`,
+        backgroundSize: "40px 40px",
+        backgroundPosition: "center",
+        opacity: 0.8
       }}
     >
       {/* YOUR TRANSFORM LAYER */}
@@ -97,8 +99,8 @@ export function InfiniteCanvas({ children }: CanvasProps) {
       </div>
 
       {/* HUD stays unchanged */}
-      <div className="absolute bottom-6 left-6 flex items-center gap-2 z-10 pointer-events-auto">
-        <div className="bg-white border-2 border-black flex gap-1 p-1 shadow-[4px_4px_0px_black]">
+      <div className="absolute bottom-6 left-6 flex items-center gap-3 z-10 pointer-events-auto">
+        <div className="bg-surface border arch-border flex gap-1 p-1 arch-shadow rounded-sm">
           <ControlButton
             icon={<RotateCcw size={14} />}
             onClick={() => {
@@ -106,12 +108,12 @@ export function InfiniteCanvas({ children }: CanvasProps) {
               setPan({ x: 0, y: 0 });
             }}
           />
-          <div className="w-[1px] bg-zinc-200 mx-1" />
+          <div className="w-[1px] bg-border mx-1" />
           <ControlButton
             icon={<Minimize2 size={14} />}
             onClick={() => setZoom((z) => Math.max(z - 0.1, 0.4))}
           />
-          <span className="text-[10px] font-bold w-10 text-center flex items-center justify-center">
+          <span className="text-[10px] font-bold w-12 text-center flex items-center justify-center text-text-primary">
             {Math.round(zoom * 100)}%
           </span>
           <ControlButton
@@ -120,8 +122,8 @@ export function InfiniteCanvas({ children }: CanvasProps) {
           />
         </div>
 
-        <div className="bg-brutal-black text-white px-3 py-1.5 border-2 border-black font-bold text-[10px] tracking-widest uppercase shadow-[4px_4px_0px_white]">
-          Infinite AI Canvas V1.0
+        <div className="bg-text-primary text-background px-3 py-1.5 border arch-border font-bold text-[9px] tracking-[0.2em] uppercase arch-shadow rounded-sm">
+          Topology Matrix V1.0
         </div>
       </div>
     </div>
@@ -132,7 +134,7 @@ function ControlButton({ icon, onClick }: { icon: React.ReactNode; onClick: () =
   return (
     <button
       onClick={onClick}
-      className="w-7 h-7 flex items-center justify-center hover:bg-zinc-100 transition-colors active:translate-y-[1px]"
+      className="w-8 h-8 flex items-center justify-center hover:bg-background transition-colors text-text-secondary hover:text-accent"
     >
       {icon}
     </button>
@@ -152,14 +154,17 @@ export function CanvasNode({ id, initialX, initialY, children }: { id: string; i
     >
       <div className="group relative">
         {/* Drag Handle Top Bar */}
-        <div className="h-4 bg-zinc-100 border-x-2 border-t-2 border-brutal-black cursor-grab active:cursor-grabbing flex items-center px-1">
-          <div className="flex gap-0.5 opacity-30">
-            {[1, 2, 3, 4, 5].map(i => <div key={i} className="w-0.5 h-0.5 bg-black rounded-full" />)}
+        <div className="h-6 bg-surface border arch-border border-b-0 cursor-grab active:cursor-grabbing flex items-center px-3 gap-2 rounded-t-sm">
+          <div className="flex gap-1.5 grayscale opacity-30">
+            <div className="w-1.5 h-1.5 rounded-full bg-text-secondary" />
+            <div className="w-1.5 h-1.5 rounded-full bg-text-secondary" />
+            <div className="w-1.5 h-1.5 rounded-full bg-text-secondary" />
           </div>
+          <span className="text-[8px] font-mono text-text-secondary/40 uppercase tracking-widest ml-auto">Visual_Manifest_v.{id.slice(0, 4)}</span>
         </div>
 
         {/* Content */}
-        <div className="relative">
+        <div className="arch-border bg-surface arch-shadow rounded-b-sm overflow-hidden">
           {children}
         </div>
       </div>

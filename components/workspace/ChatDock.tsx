@@ -88,25 +88,25 @@ RULES:
   }, [messages, isLoading]);
 
   return (
-    <aside className="w-80 border-l-2 border-brutal-black bg-white flex flex-col h-[calc(100vh-3.5rem)] sticky top-14 overflow-hidden shadow-[-4px_0px_0px_rgba(0,0,0,0.02)]">
+    <aside className="w-80 border-l arch-border bg-surface flex flex-col h-[calc(100vh-4rem)] sticky top-16 overflow-hidden arch-shadow">
       {/* Header */}
-      <div className="p-4 border-b-2 border-brutal-black bg-white">
+      <div className="p-4 border-b arch-border bg-surface">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-[10px] font-bold uppercase tracking-widest">
-              AI Command Center
+            <div className="w-2 h-2 rounded-full bg-accent animate-pulse" />
+            <span className="text-[10px] font-bold uppercase tracking-widest text-text-secondary">
+              Architectural AI
             </span>
           </div>
-          <button className="text-zinc-400 hover:text-black transition-colors">
+          <button className="text-text-secondary hover:text-text-primary transition-colors">
             <MoreHorizontal size={16} />
           </button>
         </div>
 
-        <div className="flex items-center gap-2 p-2 bg-brutal-yellow/10 border border-brutal-yellow rounded text-brutal-black">
-          <Target size={14} className="text-brutal-yellow" />
-          <span className="text-[10px] font-bold uppercase tracking-tight">
-            Focus: Architecture
+        <div className="flex items-center gap-2 p-2 bg-accent/5 border border-accent/20 rounded-sm text-accent">
+          <Target size={14} fill="#000000" />
+          <span className="text-[10px] font-bold uppercase tracking-widest">
+            Context: System Topology
           </span>
         </div>
       </div>
@@ -114,22 +114,22 @@ RULES:
       {/* Messages */}
       <div
         ref={scrollRef}
-        className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar bg-slate-50/30"
+        className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar bg-background/30"
       >
         {messages.length === 0 && (
           <div className="text-center py-10 space-y-4">
-            <div className="w-12 h-12 bg-zinc-100 rounded-full flex items-center justify-center mx-auto brutal-border">
-              <Zap size={24} className="text-brutal-yellow fill-brutal-yellow" />
+            <div className="w-12 h-12 bg-surface rounded-sm flex items-center justify-center mx-auto arch-border arch-shadow">
+              <Zap size={20} className="text-accent" fill="#000000" />
             </div>
             <div className="space-y-1">
-              <h3 className="text-xs font-bold uppercase">
-                Ready to visualize
+              <h3 className="text-xs font-bold uppercase tracking-widest text-text-primary">
+                System Initialized
               </h3>
-              <p className="text-[10px] text-zinc-500 font-medium px-4">
-                Ask about the auth flow, module clusters, or entry points.
+              <p className="text-[10px] text-text-secondary font-medium px-4 leading-relaxed">
+                Inquire about complex architecture flows, module clusters, or entry points.
               </p>
             </div>
-            <div className="grid grid-cols-1 gap-2 px-4 mt-4 text-[10px]">
+            <div className="grid grid-cols-1 gap-2 px-4 mt-6">
               <SuggestionButton
                 onClick={() => sendMessage("Explain the architecture")}
                 text="Architecture Overview"
@@ -156,16 +156,16 @@ RULES:
       </div>
 
       {/* Input */}
-      <div className="p-4 border-t-2 border-brutal-black bg-white relative">
+      <div className="p-4 border-t arch-border bg-surface relative">
         {isLocked && (
-          <div className="absolute inset-0 bg-white/80 backdrop-blur-[1px] flex items-center justify-center z-10 p-4">
-            <div className="text-[10px] font-bold text-zinc-400 text-center uppercase tracking-widest leading-tight">
-              🔓 Connect a repository <br /> to unlock AI Command
+          <div className="absolute inset-0 bg-surface/80 backdrop-blur-[1px] flex items-center justify-center z-10 p-4 rounded-sm">
+            <div className="text-[10px] font-bold text-text-secondary text-center uppercase tracking-[0.2em] leading-tight">
+              Connection Required <br /> to Access Intelligence
             </div>
           </div>
         )}
         <ChatInput
-          onSend={sendMessage}   // 🔥 DIRECT TO TAMBO
+          onSend={sendMessage}
           disabled={isLoading || isLocked}
         />
       </div>
@@ -177,7 +177,7 @@ function SuggestionButton({ text, onClick }: { text: string; onClick: () => void
   return (
     <button
       onClick={onClick}
-      className="text-left p-2 border border-zinc-200 bg-white hover:border-brutal-black hover:bg-zinc-50 transition-all font-bold uppercase tracking-tight shadow-[2px_2px_0px_rgba(0,0,0,0.05)] hover:shadow-[2px_2px_0px_black]"
+      className="text-left p-2.5 border arch-border bg-background hover:border-accent/40 rounded-sm hover:bg-surface transition-all text-[10px] font-bold uppercase tracking-widest text-text-secondary hover:text-accent arch-shadow-sm"
     >
       {text}
     </button>

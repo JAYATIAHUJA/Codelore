@@ -31,7 +31,7 @@ import {
 } from 'lucide-react';
 
 // Icon mapping for different node types
-const iconMap: Record<string, React.ComponentType<{ size?: number; className?: string }>> = {
+const iconMap = {
     frontend: Globe,
     backend: Server,
     database: Database,
@@ -45,19 +45,60 @@ const iconMap: Record<string, React.ComponentType<{ size?: number; className?: s
     controllers: Package
 };
 
-// Color schemes
-const nodeColors: Record<string, { bg: string; border: string; text: string; iconBg: string }> = {
-    frontend: { bg: '#eff6ff', border: '#3b82f6', text: '#1e40af', iconBg: '#dbeafe' },
-    backend: { bg: '#ecfdf5', border: '#10b981', text: '#065f46', iconBg: '#d1fae5' },
-    database: { bg: '#eef2ff', border: '#6366f1', text: '#3730a3', iconBg: '#e0e7ff' },
-    api: { bg: '#fffbeb', border: '#f59e0b', text: '#92400e', iconBg: '#fef3c7' },
-    config: { bg: '#f9fafb', border: '#6b7280', text: '#374151', iconBg: '#f3f4f6' },
-    tests: { bg: '#f0fdf4', border: '#22c55e', text: '#166534', iconBg: '#dcfce7' },
-    entry: { bg: '#fefce8', border: '#eab308', text: '#854d0e', iconBg: '#fef9c3' },
-    utils: { bg: '#faf5ff', border: '#8b5cf6', text: '#5b21b6', iconBg: '#ede9fe' },
-    services: { bg: '#fdf2f8', border: '#ec4899', text: '#9d174d', iconBg: '#fce7f3' },
-    routes: { bg: '#f0fdfa', border: '#14b8a6', text: '#134e4a', iconBg: '#ccfbf1' },
-    controllers: { bg: '#fff7ed', border: '#f97316', text: '#9a3412', iconBg: '#ffedd5' },
+// Color schemes for different themes
+const colorSchemes = {
+    modern: {
+        frontend: '#3b82f6',
+        backend: '#10b981',
+        database: '#6366f1',
+        api: '#f59e0b',
+        config: '#6b7280',
+        tests: '#22c55e',
+        entry: '#fbbf24',
+        utils: '#8b5cf6',
+        services: '#ec4899',
+        routes: '#14b8a6',
+        controllers: '#f97316'
+    },
+    brutal: {
+        frontend: '#000000',
+        backend: '#000000',
+        database: '#000000',
+        api: '#000000',
+        config: '#000000',
+        tests: '#000000',
+        entry: '#000000',
+        utils: '#000000',
+        services: '#000000',
+        routes: '#000000',
+        controllers: '#000000'
+    },
+    minimal: {
+        frontend: '#64748b',
+        backend: '#64748b',
+        database: '#64748b',
+        api: '#64748b',
+        config: '#64748b',
+        tests: '#64748b',
+        entry: '#64748b',
+        utils: '#64748b',
+        services: '#64748b',
+        routes: '#64748b',
+        controllers: '#64748b'
+    },
+    colorful: {
+        frontend: '#3b82f6',
+        backend: '#10b981',
+        database: '#6366f1',
+        api: '#f59e0b',
+        config: '#6b7280',
+        tests: '#22c55e',
+        entry: '#fbbf24',
+        utils: '#8b5cf6',
+        services: '#ec4899',
+        routes: '#14b8a6',
+        controllers: '#f97316'
+    }
 };
 
 interface GraphNode {
@@ -132,71 +173,76 @@ export function ProjectGraph({
         // If nodes are already provided (AI-generated), use them directly
         if (effectiveNodes && effectiveNodes.length > 0) {
             const processedNodes = effectiveNodes.map((node: any) => {
-                // Handle legacy Node format
-                if (node.data && node.position) return node;
+                // Handle both legacy Node format and new GraphNode format
+                if (node.data && node.position) {
+                    // Legacy Node format
+                    return node;
+                }
                 
                 // New GraphNode format - convert to ReactFlow Node
-                const moduleType = node.type || 'backend';
-                const colors = nodeColors[moduleType] || nodeColors.backend;
-                const IconComponent = iconMap[moduleType] || Code;
+                const IconComponent = iconMap[node.type as keyof typeof iconMap] || Code;
+                const colors = colorSchemes[style.theme || 'modern'];
+                const nodeColor = node.style?.color || colors[node.type as keyof typeof colors] || '#666';
+                const nodeSize = (node.style?.size || 'medium') as keyof typeof sizeMap;
+                
                 const sizeMap = {
-                    small: { width: 200, height: 90 },
-                    medium: { width: 240, height: 110 },
-                    large: { width: 280, height: 130 }
+                    small: { width: 140, height: 80, fontSize: 12 },
+                    medium: { width: 180, height: 100, fontSize: 14 },
+                    large: { width: 220, height: 120, fontSize: 16 }
                 };
-                const dim = sizeMap[node.style?.size || 'medium'];
+                
+                const dimensions = sizeMap[nodeSize];
                 
                 return {
                     id: node.id,
                     position: node.position || { x: 0, y: 0 },
                     data: { 
                         label: (
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 12px', width: '100%' }}>
-                                <div style={{ 
-                                    width: 36, height: 36, minWidth: 36, borderRadius: 8,
-                                    background: colors.iconBg, border: `2px solid ${colors.border}`,
-                                    display: 'flex', alignItems: 'center', justifyContent: 'center'
-                                }}>
-                                    <IconComponent size={18} className="shrink-0" />
-                                </div>
-                                <div style={{ flex: 1, overflow: 'hidden', textAlign: 'left' }}>
-                                    <div style={{ fontWeight: 700, fontSize: 13, color: colors.text, lineHeight: 1.2, marginBottom: 2 }}>
-                                        {node.label}
-                                    </div>
-                                    {node.description && (
-                                        <div style={{ fontSize: 10, color: '#6b7280', lineHeight: 1.3, whiteSpace: 'normal', wordBreak: 'break-word' }}>
-                                            {node.description.length > 50 ? node.description.slice(0, 50) + '…' : node.description}
-                                        </div>
-                                    )}
-                                </div>
+                            <div className="flex flex-col items-center gap-1 p-2">
+                                <IconComponent size={20} color={nodeColor} />
+                                <div className="font-semibold text-xs text-center">{node.label}</div>
+                                {node.description && (
+                                    <div className="text-xs opacity-70 text-center max-w-full truncate">{node.description}</div>
+                                )}
                             </div>
                         )
                     },
                     sourcePosition: Position.Right,
                     targetPosition: Position.Left,
                     style: {
-                        background: colors.bg,
-                        border: `2px solid ${colors.border}`,
-                        borderRadius: '10px',
-                        padding: 0,
-                        width: dim.width,
-                        boxShadow: `3px 3px 0px ${colors.border}40`,
-                        overflow: 'hidden',
+                        background: style.theme === 'brutal' ? '#ffffff' : `linear-gradient(135deg, ${nodeColor}15, ${nodeColor}05)`,
+                        border: style.theme === 'brutal' ? '3px solid #000000' : `2px solid ${nodeColor}`,
+                        borderRadius: style.theme === 'brutal' ? '0px' : '12px',
+                        padding: '8px',
+                        fontWeight: 'bold',
+                        width: dimensions.width,
+                        height: dimensions.height,
+                        textAlign: 'center',
+                        boxShadow: style.theme === 'brutal' ? '6px 6px 0px rgba(0,0,0,1)' : `0 4px 12px ${nodeColor}30`,
+                        fontSize: `${dimensions.fontSize}px`,
+                        fontFamily: style.theme === 'brutal' ? 'var(--font-geist-mono)' : 'system-ui',
+                        backdropFilter: 'blur(8px)',
                     },
                     type: 'default',
                 };
             });
             
             const processedEdges = (effectiveEdges || []).map((edge: any) => {
-                if (edge.source && edge.target && edge.id && edge.markerEnd) return edge;
+                // Handle both legacy Edge format and new GraphEdge format
+                if (edge.source && edge.target && edge.id) {
+                    // Legacy Edge format
+                    return edge;
+                }
                 
-                const edgeColors: Record<string, string> = {
+                // New GraphEdge format - convert to ReactFlow Edge
+                const edgeColors = {
                     import: '#3b82f6',
                     'data-flow': '#10b981',
                     'api-call': '#f59e0b',
-                    dependency: '#9ca3af'
+                    dependency: '#6b7280'
                 };
-                const edgeColor = edge.style?.color || edgeColors[edge.type] || '#9ca3af';
+                
+                const edgeColor = edge.style?.color || edgeColors[edge.type as keyof typeof edgeColors] || '#666';
                 
                 return {
                     id: edge.id,
@@ -204,12 +250,25 @@ export function ProjectGraph({
                     target: edge.target,
                     label: edge.label,
                     animated: edge.animated !== false && style.animations,
-                    style: { stroke: edgeColor, strokeWidth: edge.style?.width || 2 },
-                    markerEnd: { type: MarkerType.ArrowClosed, color: edgeColor, height: 14, width: 14 },
-                    labelStyle: { fontSize: '10px', fontWeight: 700, fill: edgeColor },
-                    labelBgStyle: { fill: 'white', fillOpacity: 0.9 },
-                    labelBgPadding: [4, 8] as [number, number],
-                    labelBgBorderRadius: 4,
+                    style: { 
+                        stroke: edgeColor, 
+                        strokeWidth: edge.style?.width || 2,
+                        strokeDasharray: edge.style?.dashArray
+                    },
+                    markerEnd: {
+                        type: MarkerType.ArrowClosed,
+                        color: edgeColor,
+                        height: 16,
+                        width: 16,
+                    },
+                    labelStyle: {
+                        fontSize: '10px',
+                        fontWeight: 'bold',
+                        fill: edgeColor,
+                        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                        padding: '2px 6px',
+                        borderRadius: '4px'
+                    }
                 };
             });
             
@@ -279,9 +338,9 @@ export function ProjectGraph({
             layers[rank].push({ ...mod, type: getModuleType(mod) });
         });
 
-        // Node generation with proper sizing
+        // Enhanced node generation with AI-driven styling
         const spacingX = spacing;
-        const spacingY = direction === 'vertical' ? 200 : 160;
+        const spacingY = direction === 'vertical' ? 200 : 150;
 
         Object.keys(layers).forEach(rankStr => {
             const rank = parseFloat(rankStr);
@@ -289,10 +348,12 @@ export function ProjectGraph({
             const layerHeight = mods.length * spacingY;
 
             mods.forEach((mod, index) => {
-                const moduleType = mod.type as string;
-                const colors = nodeColors[moduleType] || nodeColors.backend;
-                const IconComponent = iconMap[moduleType] || Code;
+                const moduleType = mod.type;
+                const IconComponent = iconMap[moduleType as keyof typeof iconMap] || Code;
+                const colors = colorSchemes[style.theme || 'modern'];
+                const nodeColor = colors[moduleType as keyof typeof colors] || mod.color || '#666';
                 
+                // Dynamic positioning based on direction
                 const x = direction === 'vertical' 
                     ? (index % 2) * spacingX + 100
                     : rank * spacingX;
@@ -305,37 +366,30 @@ export function ProjectGraph({
                     position: { x, y },
                     data: { 
                         label: (
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 12px', width: '100%' }}>
-                                <div style={{ 
-                                    width: 36, height: 36, minWidth: 36, borderRadius: 8,
-                                    background: colors.iconBg, border: `2px solid ${colors.border}`,
-                                    display: 'flex', alignItems: 'center', justifyContent: 'center'
-                                }}>
-                                    <IconComponent size={18} className="shrink-0" />
-                                </div>
-                                <div style={{ flex: 1, overflow: 'hidden', textAlign: 'left' }}>
-                                    <div style={{ fontWeight: 700, fontSize: 13, color: colors.text, lineHeight: 1.2, marginBottom: 2 }}>
-                                        {mod.name}
-                                    </div>
-                                    {mod.description && (
-                                        <div style={{ fontSize: 10, color: '#6b7280', lineHeight: 1.3, whiteSpace: 'normal', wordBreak: 'break-word' }}>
-                                            {mod.description.length > 50 ? mod.description.slice(0, 50) + '…' : mod.description}
-                                        </div>
-                                    )}
-                                </div>
+                            <div className="flex flex-col items-center gap-1 p-2">
+                                <IconComponent size={20} color={nodeColor} />
+                                <div className="font-semibold text-xs text-center">{mod.name}</div>
+                                {mod.description && (
+                                    <div className="text-xs opacity-70 text-center max-w-full truncate">{mod.description}</div>
+                                )}
                             </div>
                         )
                     },
                     sourcePosition: direction === 'vertical' ? Position.Bottom : Position.Right,
                     targetPosition: direction === 'vertical' ? Position.Top : Position.Left,
                     style: {
-                        background: colors.bg,
-                        border: `2px solid ${colors.border}`,
-                        borderRadius: '10px',
-                        padding: 0,
-                        width: 240,
-                        boxShadow: `3px 3px 0px ${colors.border}40`,
-                        overflow: 'hidden',
+                        background: style.theme === 'brutal' ? '#ffffff' : `linear-gradient(135deg, ${nodeColor}15, ${nodeColor}05)`,
+                        border: style.theme === 'brutal' ? '3px solid #000000' : `2px solid ${nodeColor}`,
+                        borderRadius: style.theme === 'brutal' ? '0px' : '12px',
+                        padding: '8px',
+                        fontWeight: 'bold',
+                        width: 180,
+                        height: 100,
+                        textAlign: 'center',
+                        boxShadow: style.theme === 'brutal' ? '6px 6px 0px rgba(0,0,0,1)' : `0 4px 12px ${nodeColor}30`,
+                        fontSize: '14px',
+                        fontFamily: style.theme === 'brutal' ? 'var(--font-geist-mono)' : 'system-ui',
+                        backdropFilter: 'blur(8px)',
                     },
                     type: 'default',
                 });
@@ -353,7 +407,7 @@ export function ProjectGraph({
                                 'dependency': '#6b7280',
                                 'import': '#3b82f6'
                             };
-                            const edgeColor = edgeColors[edgeType as keyof typeof edgeColors] || '#9ca3af';
+                            const edgeColor = edgeColors[edgeType as keyof typeof edgeColors] || '#666';
                             
                             generatedEdges.push({
                                 id: `${mod.name}-${dep}`,
@@ -363,12 +417,24 @@ export function ProjectGraph({
                                        edgeType === 'api-call' ? 'API' : 
                                        edgeType === 'dependency' ? 'depends' : 'imports',
                                 animated: style.animations,
-                                style: { stroke: edgeColor, strokeWidth: 2 },
-                                markerEnd: { type: MarkerType.ArrowClosed, color: edgeColor, height: 14, width: 14 },
-                                labelStyle: { fontSize: '10px', fontWeight: 700, fill: edgeColor },
-                                labelBgStyle: { fill: 'white', fillOpacity: 0.9 },
-                                labelBgPadding: [4, 8] as [number, number],
-                                labelBgBorderRadius: 4,
+                                style: { 
+                                    stroke: edgeColor, 
+                                    strokeWidth: 2,
+                                },
+                                markerEnd: {
+                                    type: MarkerType.ArrowClosed,
+                                    color: edgeColor,
+                                    height: 16,
+                                    width: 16,
+                                },
+                                labelStyle: {
+                                    fontSize: '10px',
+                                    fontWeight: 'bold',
+                                    fill: edgeColor,
+                                    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                                    padding: '2px 6px',
+                                    borderRadius: '4px'
+                                }
                             });
                         }
                     });
@@ -389,86 +455,68 @@ export function ProjectGraph({
     }, [autoNodes, autoEdges, setNodes, setEdges]);
 
     // Enhanced styling with theme support
-    const backgroundVariant = style.background === 'grid' ? BackgroundVariant.Lines : 
+    const backgroundVariant = style.background === 'grid' ? BackgroundVariant.Dots : 
                            style.background === 'solid' ? undefined : 
                            BackgroundVariant.Dots;
+    
+    const flowStyles = {
+        background: style.theme === 'brutal' ? '#ffffff' : 'transparent',
+        height: '600px',
+        width: '100%',
+    };
 
     return (
-        <div className="border-2 border-black bg-white shadow-[6px_6px_0px_black] overflow-hidden" style={{ width: '100%' }}>
-            {/* Title Bar */}
-            <div className="px-4 py-2.5 bg-gradient-to-r from-indigo-500 to-purple-600 border-b-2 border-black flex items-center justify-between">
-                <h3 className="font-[var(--font-bangers)] text-lg tracking-wider text-white drop-shadow-[1px_1px_0px_rgba(0,0,0,0.3)]">
-                    {title}
-                </h3>
-                <div className="flex items-center gap-1.5">
-                    <div className="w-3 h-3 rounded-full bg-red-400 border border-black/20" />
-                    <div className="w-3 h-3 rounded-full bg-yellow-400 border border-black/20" />
-                    <div className="w-3 h-3 rounded-full bg-green-400 border border-black/20" />
-                </div>
+        <div style={{ width: '100%', height: '600px', position: 'relative' }}>
+            {/* Title Overlay */}
+            <div className="absolute top-4 left-4 z-10 bg-white border-2 border-black p-2 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] rounded-md">
+                <h3 className="font-[var(--font-bangers)] text-xl tracking-wide">{title}</h3>
             </div>
 
-            {/* Graph Container */}
-            <div style={{ width: '100%', height: '500px' }}>
-                <ReactFlow
-                    nodes={nodes}
-                    edges={edges}
-                    onNodesChange={onNodesChange}
-                    onEdgesChange={onEdgesChange}
-                    style={{ width: '100%', height: '100%', background: '#fafafa' }}
-                    fitView
-                    fitViewOptions={{ padding: 0.3 }}
-                    attributionPosition="bottom-right"
-                    proOptions={{ hideAttribution: true }}
-                    minZoom={0.3}
-                    maxZoom={2}
-                >
-                    {backgroundVariant && (
-                        <Background 
-                            color="#e5e7eb"
-                            gap={24} 
-                            variant={backgroundVariant} 
-                            size={1}
-                        />
-                    )}
-                    <Controls
-                        style={{
-                            border: '2px solid #000',
-                            borderRadius: '6px',
-                            boxShadow: '3px 3px 0px rgba(0,0,0,0.15)',
-                            background: '#fff',
-                        }}
-                        showInteractive={false}
+            <ReactFlow
+                nodes={nodes}
+                edges={edges}
+                onNodesChange={onNodesChange}
+                onEdgesChange={onEdgesChange}
+                style={flowStyles}
+                fitView
+                attributionPosition="bottom-right"
+                defaultViewport={{ x: 0, y: 0, zoom: 0.8 }}
+            >
+                {backgroundVariant && (
+                    <Background 
+                        color={style.theme === 'brutal' ? '#000000' : '#ccc'} 
+                        gap={20} 
+                        variant={backgroundVariant} 
                     />
-                    <MiniMap
-                        style={{
-                            border: '2px solid #000',
-                            borderRadius: '6px',
-                            background: '#fff',
-                            boxShadow: '3px 3px 0px rgba(0,0,0,0.1)',
-                        }}
-                        maskColor="rgba(0,0,0,0.08)"
-                        zoomable
-                        pannable
-                        nodeColor={(n) => {
-                            const borderColor = (n.style as any)?.border;
-                            if (typeof borderColor === 'string') {
-                                const match = borderColor.match(/#[0-9a-fA-F]{6}/);
-                                return match ? match[0] : '#ddd';
-                            }
-                            return '#ddd';
-                        }}
-                    />
-                </ReactFlow>
-            </div>
+                )}
+                <Controls
+                    style={{
+                        border: style.theme === 'brutal' ? '3px solid #000000' : '2px solid black',
+                        borderRadius: style.theme === 'brutal' ? '0px' : '4px',
+                        boxShadow: style.theme === 'brutal' ? '4px 4px 0px rgba(0,0,0,1)' : '4px 4px 0px rgba(0,0,0,0.1)'
+                    }}
+                    showInteractive={false}
+                />
+                <MiniMap
+                    style={{
+                        border: style.theme === 'brutal' ? '3px solid #000000' : '2px solid black',
+                        borderRadius: style.theme === 'brutal' ? '0px' : '4px'
+                    }}
+                    zoomable
+                    pannable
+                    nodeColor={(n) => {
+                        // Extract color from node style or use default
+                        if (typeof n.style === 'object' && n.style) {
+                            const styleObj = n.style as any;
+                            return styleObj.background?.includes('gradient') ? '#666' : styleObj.background || '#fff';
+                        }
+                        return '#fff';
+                    }}
+                />
+            </ReactFlow>
 
-            {/* Footer */}
-            <div className="px-4 py-1.5 border-t-2 border-black bg-zinc-50 flex items-center justify-between">
-                <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">
-                    Drag nodes to rearrange • Scroll to zoom
-                </span>
-                <span className="text-[10px] font-mono text-zinc-300">
-                    {nodes.length} nodes · {edges.length} edges
-                </span>
+            <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 bg-white/80 px-2 py-1 rounded text-xs text-zinc-500 font-mono border border-zinc-200">
+                * Interactive Graph • Drag nodes to explore *
             </div>
         </div>
     );

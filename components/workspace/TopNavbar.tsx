@@ -3,64 +3,64 @@
 import { motion } from "framer-motion";
 import { Github, Search, Share, Settings, Command, Unplug, Plus, X } from "lucide-react";
 import { useRepo } from "@/components/providers/RepoProvider";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { useWorkspaceTabs } from "@/components/providers/WorkspaceTabsProvider";
+import Link from "next/link";
 
 export function TopNavbar() {
   const { repoData, setRepoData } = useRepo();
   const { tabs, activeTabId, addTab, removeTab, switchTab } = useWorkspaceTabs();
 
   return (
-    <nav className="h-14 border-b-2 border-brutal-black bg-white flex items-center justify-between px-4 z-50 sticky top-0">
+    <nav className="h-16 border-b arch-border bg-navbar-bg backdrop-blur-xl flex items-center justify-between px-6 z-50 sticky top-0">
       {/* Left: Branding & Tabs */}
-      <div className="flex items-center gap-4">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-brutal-black flex items-center justify-center brutal-border-thick rotate-3 shadow-[2px_2px_0px_black]">
-             <span className="text-white font-[var(--font-bangers)] text-sm tracking-tight">CL</span>
+      <div className="flex items-center gap-8">
+        <Link href="/" className="flex items-center gap-2 group">
+          <div className="w-5 h-5 bg-accent rounded-sm flex items-center justify-center -rotate-6 group-hover:rotate-0 transition-transform duration-300">
+             <div className="w-2 h-2 bg-[#000000] rounded-full" />
           </div>
-          <h1 className="font-[var(--font-bangers)] text-xl tracking-wider">CODELORE</h1>
-        </div>
+          <span className="text-xl font-bold tracking-tighter text-text-primary uppercase group-hover:tracking-normal transition-all duration-300">CodeLore</span>
+        </Link>
 
-        <div className="h-6 w-[2px] bg-zinc-200" />
+        <div className="h-6 w-[1px] bg-border" />
 
-        {/* Workspace Tabs */}
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-2">
           {tabs.map((tab) => (
-            <button
+            <div
               key={tab.id}
-              onClick={() => switchTab(tab.id)}
-              className={`group flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider border-2 rounded transition-all ${
+              className={`group flex items-center gap-2 h-9 px-4 rounded-sm border transition-all cursor-pointer ${
                 tab.id === activeTabId
-                  ? "border-black bg-brutal-black text-white shadow-[2px_2px_0px_black]"
-                  : "border-zinc-300 bg-white text-zinc-500 hover:border-black hover:text-black"
+                  ? "arch-border bg-background text-accent"
+                  : "border-transparent text-text-secondary hover:bg-text-primary/5 hover:text-text-primary"
               }`}
+              onClick={() => switchTab(tab.id)}
             >
-              {tab.repoData ? (
-                <span className="flex items-center gap-1">
-                  <Github size={10} />
-                  {tab.repoData.repo.name}
-                </span>
-              ) : (
-                <span>Empty</span>
-              )}
+              <Github size={12} className={tab.id === activeTabId ? "text-accent" : "text-text-secondary"} />
+              <span className="text-[10px] font-bold uppercase tracking-widest leading-none">
+                {tab.repoData ? tab.repoData.repo.name : "New Workspace"}
+              </span>
+              
               {tabs.length > 1 && (
-                <span
-                  onClick={(e) => { e.stopPropagation(); removeTab(tab.id); }}
-                  className={`ml-1 rounded-full p-0.5 transition-colors ${
-                    tab.id === activeTabId 
-                      ? "hover:bg-white/20" 
-                      : "hover:bg-zinc-200 opacity-0 group-hover:opacity-100"
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    removeTab(tab.id);
+                  }}
+                  className={`ml-1 p-0.5 rounded-sm transition-colors ${
+                    tab.id === activeTabId
+                      ? "hover:bg-accent/10 text-accent"
+                      : "hover:bg-text-primary/10 text-text-secondary/40 opacity-0 group-hover:opacity-100"
                   }`}
                 >
-                  <X size={8} />
-                </span>
+                  <X size={10} />
+                </button>
               )}
-            </button>
+            </div>
           ))}
 
-          {/* Add Tab Button */}
           <button
             onClick={addTab}
-            className="w-7 h-7 border-2 border-dashed border-zinc-300 flex items-center justify-center hover:border-black hover:bg-zinc-50 transition-all rounded text-zinc-400 hover:text-black"
+            className="w-9 h-9 border border-dashed arch-border flex items-center justify-center hover:bg-text-primary/5 transition-all rounded-sm text-text-secondary hover:text-accent"
             title="Open new workspace"
           >
             <Plus size={14} />
@@ -70,40 +70,45 @@ export function TopNavbar() {
 
       {/* Center: Command Bar */}
       <div className="hidden md:flex flex-1 max-w-md mx-8">
-        <div className="w-full h-9 brutal-border bg-emerald-50/50 flex items-center px-3 gap-3 cursor-pointer hover:bg-white transition-all group">
-          <Search size={16} className="text-zinc-400 group-hover:text-brutal-black" />
-          <span className="text-sm font-medium text-zinc-400 flex-1">Search files, functions, flows...</span>
-          <div className="flex items-center gap-1 bg-zinc-100 border border-zinc-300 px-1.5 py-0.5 rounded shadow-[1px_1px_0px_black]">
+        <div className="w-full h-10 border arch-border bg-background flex items-center px-4 gap-3 cursor-pointer hover:border-accent/40 transition-all group rounded-sm">
+          <Search size={16} className="text-text-secondary group-hover:text-accent" />
+          <span className="text-sm font-medium text-text-secondary flex-1">Search architecture...</span>
+          <div className="flex items-center gap-1 bg-surface border arch-border px-1.5 py-0.5 rounded text-[10px] font-mono text-text-secondary">
             <Command size={10} />
-            <span className="text-[10px] font-bold">K</span>
+            <span className="font-bold">K</span>
           </div>
         </div>
       </div>
 
       {/* Right: Actions */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-6">
+        <div className="flex items-center gap-4">
+          <ThemeToggle />
+          <div className="w-[1px] h-6 bg-border" />
+          <div className="flex items-center gap-2">
+            <button 
+              title="Share Workspace"
+              className="w-10 h-10 border arch-border bg-surface flex items-center justify-center hover:bg-background transition-all rounded-sm text-text-secondary hover:text-accent arch-shadow"
+            >
+              <Share size={16} />
+            </button>
+            <button 
+              title="Settings"
+              className="w-10 h-10 border arch-border bg-surface flex items-center justify-center hover:bg-background transition-all rounded-sm text-text-secondary hover:text-accent arch-shadow"
+            >
+              <Settings size={16} />
+            </button>
+          </div>
+        </div>
+        
         {!repoData && (
           <button 
             onClick={() => document.querySelector("input")?.focus()}
-            className="brutal-btn-cyan h-9 px-4 text-xs font-bold uppercase flex items-center gap-2"
+            className="arch-btn-primary h-10 px-4 text-xs font-bold uppercase"
           >
             Connect GitHub
           </button>
         )}
-        <div className="flex items-center gap-2">
-          <button 
-            title="Share Workspace"
-            className="w-9 h-9 border-2 border-black flex items-center justify-center hover:bg-zinc-50 transition-all rounded shadow-[2px_2px_0px_black] active:shadow-none active:translate-x-[2px] active:translate-y-[2px]"
-          >
-            <Share size={16} />
-          </button>
-          <button 
-            title="Settings"
-            className="w-9 h-9 border-2 border-black flex items-center justify-center hover:bg-zinc-50 transition-all rounded shadow-[2px_2px_0px_black] active:shadow-none active:translate-x-[2px] active:translate-y-[2px]"
-          >
-            <Settings size={16} />
-          </button>
-        </div>
       </div>
     </nav>
   );

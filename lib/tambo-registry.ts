@@ -16,20 +16,20 @@ export const componentRegistry: TamboComponent[] = [
       "Displays structured data in a table format. Use when the user asks for a 'table', 'list', 'comparison', 'matrix', or 'grid' of data. Suitable for listing API endpoints, database schemas, configuration options, dependencies, or any structured data that fits in rows and columns.",
     component: GenerativeTable,
     propsSchema: z.object({
-      title: z.string().optional().default("DATA TABLE").describe("Title of the table"),
-      description: z.string().optional().describe("Optional description of what the table shows"),
+      title: z.string().nullish().optional().default("DATA TABLE").describe("Title of the table"),
+      description: z.string().nullish().optional().describe("Optional description of what the table shows"),
       columns: z.array(
         z.object({
-          header: z.string().optional().default("").describe("Header text for the column"),
-          width: z.string().optional().describe("CSS width (e.g. '20%', '100px')"),
-          align: z.string().optional().default("left").describe("Text alignment for the column (left, center, right)"),
+          header: z.string().nullish().optional().default("").describe("Header text for the column"),
+          width: z.string().nullish().optional().describe("CSS width (e.g. '20%', '100px')"),
+          align: z.string().nullish().optional().default("left").describe("Text alignment for the column (left, center, right)"),
         })
-      ).optional().default([]).describe("Column definitions"),
+      ).nullish().optional().default([]).describe("Column definitions"),
       rows: z.array(
         z.object({
-          values: z.array(z.string().optional().default("")).optional().default([]).describe("Array of cell values corresponding to the column order"),
+          values: z.array(z.string().nullish().optional().default("")).nullish().optional().default([]).describe("Array of cell values corresponding to the column order"),
         })
-      ).optional().default([]).describe("Data rows for the table"),
+      ).nullish().optional().default([]).describe("Data rows for the table"),
     }),
   },
   {
@@ -40,27 +40,29 @@ export const componentRegistry: TamboComponent[] = [
     propsSchema: z.object({
       filter: z
         .string()
+        .nullish()
         .optional()
         .default("all")
         .describe("Which modules to show. Use 'all' by default. Options: 'all', 'frontend', 'backend', 'database', 'config', 'tests'. Real repositories auto-detect these types."),
       title: z
         .string()
+        .nullish()
         .optional()
         .default("PROJECT OVERVIEW")
         .describe("A short comic-style title for the section, e.g. 'PROJECT OVERVIEW!' or 'BACKEND MODULES!'"),
       modules: z
         .array(
           z.object({
-            name: z.string().optional().default("Unknown Module").describe("Name of the module, e.g. 'Next.js Frontend', 'Node.js Backend'"),
-            description: z.string().optional().default("").describe("Brief description of what this module does"),
-            files: z.array(z.string()).optional().default([]).describe("List of key files in this module"),
-            dependencies: z.array(z.string()).optional().default([]).describe("List of other modules this module depends on"),
-            color: z.string().optional().default("#000000").describe("Hex color code for the module tag"),
-            type: z.enum(['frontend', 'backend', 'database', 'config', 'tests', 'docs']).optional().describe("Module type for filtering"),
+            name: z.string().nullish().optional().default("Unknown Module").describe("Name of the module, e.g. 'Next.js Frontend', 'Node.js Backend'"),
+            description: z.string().nullish().optional().default("").describe("Brief description of what this module does"),
+            files: z.array(z.string()).nullish().optional().default([]).describe("List of key files in this module"),
+            dependencies: z.array(z.string()).nullish().optional().default([]).describe("List of other modules this module depends on"),
+            color: z.string().nullish().optional().default("#000000").describe("Hex color code for the module tag"),
+            type: z.enum(['frontend', 'backend', 'database', 'config', 'tests', 'docs']).nullish().optional().describe("Module type for filtering"),
           })
         )
+        .nullish()
         .optional()
-        .nullable()
         .describe("Optional custom modules. If omitted, will use real repository analysis or fall back to mock data."),
     }),
   },
@@ -72,16 +74,19 @@ export const componentRegistry: TamboComponent[] = [
     propsSchema: z.object({
       filter: z
         .string()
+        .nullish()
         .optional()
         .default("all")
         .describe("Which part of the tree to show. 'all' shows everything. For advanced filtering, use specific types."),
       highlightImportant: z
         .boolean()
+        .nullish()
         .optional()
         .default(true)
         .describe("If true, highlight important files with a star icon."),
       title: z
         .string()
+        .nullish()
         .optional()
         .default("FOLDER STRUCTURE")
         .describe("A short comic-style title, e.g. 'FOLDER STRUCTURE!' or 'REPOSITORY FILES!'"),
@@ -95,6 +100,7 @@ export const componentRegistry: TamboComponent[] = [
     propsSchema: z.object({
       title: z
         .string()
+        .nullish()
         .optional()
         .default("AUTH FLOW")
         .describe("A comic-style title, e.g. 'AUTH FLOW!' or 'LOGIN SEQUENCE!'"),
@@ -113,10 +119,12 @@ export const componentRegistry: TamboComponent[] = [
         .describe("Comic-style title like 'REQUEST LIFECYCLE!' or 'DATABASE FLOW!'"),
       columns: z
         .any()
+        .nullish()
         .optional()
         .describe(`REQUIRED: An array of 2-4 column objects. NEVER leave this empty. Each column MUST have: title (string), color (hex string), blocks (non-empty array). Example: [{"title":"Entry Point","color":"#FFD600","blocks":[{"id":"main","label":"main()","code":"async function main() {\n  const app = createApp();\n  await app.listen(3000);\n}","highlights":["createApp"],"description":"App entry"}]},{"title":"Service Layer","color":"#bbdefb","blocks":[{"id":"svc","label":"createApp()","code":"function createApp() {\n  const router = new Router();\n  return router;\n}","highlights":["Router"]}]}]`),
       connections: z
         .any()
+        .nullish()
         .optional()
         .describe(`Array of arrow objects connecting blocks by ID. Example: [{"from":"main","to":"svc","label":"calls"},{"from":"svc","to":"db","label":"queries"}]`),
     }),
@@ -127,48 +135,48 @@ export const componentRegistry: TamboComponent[] = [
       "Creates an intelligent, interactive graph visualization of the entire project structure with AI-driven layout, styling, and relationship analysis. Use when user asks to 'visualize the project', 'show project graph', 'create architecture diagram', 'show dependencies', or 'map the codebase'. AI can specify nodes, edges, layout, and styling for optimal visualization.",
     component: ProjectGraph,
     propsSchema: z.object({
-      title: z.string().optional().default("PROJECT MAP").describe("Title of the graph, e.g. 'PROJECT MAP', 'ARCHITECTURE DIAGRAM', 'DEPENDENCY GRAPH'"),
+      title: z.string().nullish().optional().default("PROJECT MAP").describe("Title of the graph, e.g. 'PROJECT MAP', 'ARCHITECTURE DIAGRAM', 'DEPENDENCY GRAPH'"),
       initialNodes: z.array(
         z.object({
           id: z.string().describe("Unique ID for the node"),
           label: z.string().describe("Display label for the node"),
           type: z.enum(["frontend", "backend", "database", "api", "config", "tests", "entry", "utils", "services", "routes", "controllers"]).describe("Type of module for icon and color mapping"),
-          description: z.string().optional().describe("Brief description of what this module does"),
-          files: z.array(z.string()).optional().describe("Key files in this module"),
-          importance: z.enum(["high", "medium", "low"]).optional().describe("Importance level for visual emphasis"),
-          position: z.object({ x: z.number().default(0), y: z.number().default(0) }).optional().describe("X/Y coordinates - if not provided, AI will auto-layout"),
+          description: z.string().nullish().optional().describe("Brief description of what this module does"),
+          files: z.array(z.string()).nullish().optional().describe("Key files in this module"),
+          importance: z.enum(["high", "medium", "low"]).nullish().optional().describe("Importance level for visual emphasis"),
+          position: z.object({ x: z.number().default(0), y: z.number().default(0) }).nullish().optional().describe("X/Y coordinates - if not provided, AI will auto-layout"),
           style: z.object({
-            color: z.string().optional().describe("Custom color override"),
-            icon: z.string().optional().describe("Custom icon name"),
-            size: z.enum(["small", "medium", "large"]).optional().default("medium").describe("Node size"),
-          }).optional().describe("Visual styling options"),
+            color: z.string().nullish().optional().describe("Custom color override"),
+            icon: z.string().nullish().optional().describe("Custom icon name"),
+            size: z.enum(["small", "medium", "large"]).nullish().optional().default("medium").describe("Node size"),
+          }).nullish().optional().describe("Visual styling options"),
         })
-      ).optional().default([]).describe("Nodes in the graph - AI can create these based on repository analysis"),
+      ).nullish().optional().default([]).describe("Nodes in the graph - AI can create these based on repository analysis"),
       initialEdges: z.array(
         z.object({
           id: z.string().describe("Unique ID for the edge"),
           source: z.string().describe("ID of the source node"),
           target: z.string().describe("ID of the target node"),
-          label: z.string().optional().describe("Label on the connection line"),
-          type: z.enum(["import", "data-flow", "api-call", "dependency"]).optional().default("dependency").describe("Type of relationship for styling"),
-          animated: z.boolean().optional().default(true).describe("Whether the edge should be animated"),
+          label: z.string().nullish().optional().describe("Label on the connection line"),
+          type: z.enum(["import", "data-flow", "api-call", "dependency"]).nullish().optional().default("dependency").describe("Type of relationship for styling"),
+          animated: z.boolean().nullish().optional().default(true).describe("Whether the edge should be animated"),
           style: z.object({
-            color: z.string().optional().describe("Custom edge color"),
-            width: z.number().optional().default(2).describe("Edge thickness"),
-            dashArray: z.string().optional().describe("Dash pattern for dashed lines"),
-          }).optional().describe("Edge styling options"),
+            color: z.string().nullish().optional().describe("Custom edge color"),
+            width: z.number().nullish().optional().default(2).describe("Edge thickness"),
+            dashArray: z.string().nullish().optional().describe("Dash pattern for dashed lines"),
+          }).nullish().optional().describe("Edge styling options"),
         })
-      ).optional().default([]).describe("Connections between nodes - AI determines relationships"),
+      ).nullish().optional().default([]).describe("Connections between nodes - AI determines relationships"),
       layout: z.object({
-        direction: z.enum(["horizontal", "vertical", "radial"]).optional().default("horizontal").describe("Layout direction"),
-        spacing: z.number().optional().default(350).describe("Spacing between nodes"),
-        algorithm: z.enum(["hierarchical", "force", "circular"]).optional().default("hierarchical").describe("Layout algorithm to use"),
-      }).optional().describe("Layout configuration for optimal node arrangement"),
+        direction: z.enum(["horizontal", "vertical", "radial"]).nullish().optional().default("horizontal").describe("Layout direction"),
+        spacing: z.number().nullish().optional().default(350).describe("Spacing between nodes"),
+        algorithm: z.enum(["hierarchical", "force", "circular"]).nullish().optional().default("hierarchical").describe("Layout algorithm to use"),
+      }).nullish().optional().describe("Layout configuration for optimal node arrangement"),
       style: z.object({
-        theme: z.enum(["modern", "brutal", "minimal", "colorful"]).optional().default("modern").describe("Visual theme - modern has gradients and shadows, brutal has black borders"),
-        background: z.enum(["grid", "dots", "solid"]).optional().default("dots").describe("Background pattern"),
-        animations: z.boolean().optional().default(true).describe("Enable animations and transitions"),
-      }).optional().describe("Overall visual styling and theme"),
+        theme: z.enum(["modern", "brutal", "minimal", "colorful"]).nullish().optional().default("modern").describe("Visual theme - modern has gradients and shadows, brutal has black borders"),
+        background: z.enum(["grid", "dots", "solid"]).nullish().optional().default("dots").describe("Background pattern"),
+        animations: z.boolean().nullish().optional().default(true).describe("Enable animations and transitions"),
+      }).nullish().optional().describe("Overall visual styling and theme"),
     }),
   },
   {
@@ -179,6 +187,7 @@ export const componentRegistry: TamboComponent[] = [
     propsSchema: z.object({
       filename: z
         .string()
+        .nullish()
         .optional()
         .default("unknown.ts")
         .describe(
@@ -186,6 +195,7 @@ export const componentRegistry: TamboComponent[] = [
         ),
       title: z
         .string()
+        .nullish()
         .optional()
         .default("FILE BREAKDOWN!")
         .describe(
@@ -193,14 +203,17 @@ export const componentRegistry: TamboComponent[] = [
         ),
       role: z
         .string()
+        .nullish()
         .optional()
         .describe("The role of the file, e.g. 'Authentication Config', 'Helper Utility', 'Main Entry Point'"),
       description: z
         .string()
+        .nullish()
         .optional()
         .describe("A detailed explanation of what the file does, its key functions, and its importance in the project."),
       importance: z
         .enum(["Critical", "High", "Medium", "Low"])
+        .nullish()
         .optional()
         .describe("How important this file is to the overall project."),
     }),
@@ -213,11 +226,13 @@ export const componentRegistry: TamboComponent[] = [
     propsSchema: z.object({
       message: z
         .string()
+        .nullish()
         .optional()
         .default("Try asking about the project architecture, folder structure, or auth flow.")
         .describe("The guidance message to display."),
       suggestions: z
         .array(z.string())
+        .nullish()
         .optional()
         .default([
           "Explain this project",

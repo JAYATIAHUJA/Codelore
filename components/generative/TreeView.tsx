@@ -3,8 +3,8 @@
 import React, { useState } from "react";
 import { useRepo, RepoFile } from "@/components/providers/RepoProvider";
 import { ComicPanel } from "@/components/ui/ComicPanel";
+import { Folder, FolderOpen, File, ChevronRight, ChevronDown } from "lucide-react";
 
-// Define FileNode locally as we are replacing mock-data
 interface FileNode {
   name: string;
   type: "file" | "folder";
@@ -20,17 +20,6 @@ interface TreeViewProps {
   title?: string;
 }
 
-const moduleFilterMap: Record<string, string[]> = {
-  all: [],
-  backend: ["backend", "database"],
-  frontend: ["frontend"],
-  auth: ["auth"],
-  database: ["database"],
-  services: ["backend"],
-};
-
-// ... filterTree and TreeNode functions can stay mostly same, but need to be robust ...
-
 function buildFileTree(files: RepoFile[]): FileNode {
   const root: FileNode = { name: "root", type: "folder", children: [] };
 
@@ -40,8 +29,6 @@ function buildFileTree(files: RepoFile[]): FileNode {
 
     parts.forEach((part, index) => {
       const isLast = index === parts.length - 1;
-
-      // Find existing child
       let child = current.children?.find(c => c.name === part);
 
       if (!child) {
@@ -49,7 +36,6 @@ function buildFileTree(files: RepoFile[]): FileNode {
           name: part,
           type: isLast && file.type === "file" ? "file" : "folder",
           children: isLast && file.type === "file" ? undefined : [],
-          // Heuristic for importance/module (could be improved with AI analysis in future)
           importance: part.includes("config") || part.includes("README") || part.endsWith("page.tsx") ? "high" : "medium"
         };
         current.children = current.children || [];
@@ -62,25 +48,14 @@ function buildFileTree(files: RepoFile[]): FileNode {
   return root;
 }
 
-function filterTree(node: FileNode, filter: string): FileNode | null {
-  // Simplified filter for now: just return node if no specific module logic
-  if (filter === "all") return node;
-
-  // TODO: Real filtering requires knowing which file belongs to which module.
-  // For now, we will just return the full tree or simple name matching.
-  // Providing a "Coming Soon" for filtering real data if it's too complex.
-  return node;
-}
-
 function TreeNode({ node, depth, highlightImportant }: { node: FileNode; depth: number; highlightImportant: boolean }) {
   const [expanded, setExpanded] = useState(depth < 2);
   const isFolder = node.type === "folder";
   const isImportant = node.importance === "high";
 
-  // Don't show root wrapper
   if (node.name === "root") {
     return (
-      <div className="tree-line ml-0">
+      <div className="ml-0">
         {node.children?.map((child, i) => (
           <TreeNode key={`${child.name}-${i}`} node={child} depth={depth} highlightImportant={highlightImportant} />
         ))}
@@ -89,22 +64,39 @@ function TreeNode({ node, depth, highlightImportant }: { node: FileNode; depth: 
   }
 
   return (
-    <div style={{ marginLeft: depth * 16 }}>
+    <div style={{ marginLeft: depth > 0 ? 12 : 0 }}>
       <div
-        className={`flex items-center gap-2 py-1 px-2 rounded cursor-pointer hover:bg-yellow-50 transition-colors ${isImportant && highlightImportant ? "bg-yellow-50" : ""
-          }`}
+        className={`flex items-center gap-2 py-1 px-2 rounded-sm cursor-pointer hover:bg-text-primary/5 transition-colors group ${isImportant && highlightImportant ? "bg-accent/5" : ""}`}
         onClick={() => isFolder && setExpanded(!expanded)}
       >
-        <span className="text-base">
-          {isFolder ? (expanded ? "📂" : "📁") : "📄"}
+        <span className="text-text-secondary w-4 h-4 flex items-center justify-center">
+          {isFolder ? (
+            expanded ? <ChevronDown size={12} /> : <ChevronRight size={12} />
+          ) : (
+            <div className="w-1 h-1 rounded-full bg-text-secondary/30" />
+          )}
         </span>
-        <span className={`text-sm font-mono ${isImportant && highlightImportant ? "font-bold text-red-700" : ""}`}>
-          {node.name}
+        
+        <span className="flex items-center gap-2 overflow-hidden">
+          {isFolder ? (
+            expanded ? <FolderOpen size={14} className="text-accent shrink-0" /> : <Folder size={14} className="text-accent shrink-0" />
+          ) : (
+            <File size={14} className="text-text-secondary/50 shrink-0" />
+          )}
+          <span className={`text-[11px] truncate font-mono tracking-tight ${isImportant && highlightImportant ? "text-accent font-bold" : "text-text-primary"}`}>
+            {node.name}
+          </span>
         </span>
-        {isImportant && highlightImportant && <span className="text-xs">⭐</span>}
+        
+        {isImportant && highlightImportant && (
+          <span className="text-[8px] font-bold uppercase tracking-widest text-accent bg-accent/10 px-1 border border-accent/20 rounded-[2px] ml-auto opacity-0 group-hover:opacity-100 transition-opacity">
+            Priority
+          </span>
+        )}
       </div>
+
       {isFolder && expanded && node.children && (
-        <div className="tree-line ml-3">
+        <div className="border-l arch-border ml-3 my-0.5">
           {node.children.map((child, i) => (
             <TreeNode key={`${child.name}-${i}`} node={child} depth={depth + 1} highlightImportant={highlightImportant} />
           ))}
@@ -114,14 +106,17 @@ function TreeNode({ node, depth, highlightImportant }: { node: FileNode; depth: 
   );
 }
 
-export function TreeView({ filter = "all", highlightImportant = true, title = "FOLDER STRUCTURE" }: TreeViewProps) {
+export function TreeView({ highlightImportant = true, title = "DIRECTORY TREE" }: TreeViewProps) {
   const { repoData } = useRepo();
 
   if (!repoData) {
     return (
-      <ComicPanel title={title} color="#1565c0">
-        <div className="p-4 text-center">
-          <p className="text-zinc-500 text-sm mb-2">No repository connected.</p>
+      <ComicPanel title={title}>
+        <div className="p-8 text-center flex flex-col items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-text-primary/5 border arch-border flex items-center justify-center opacity-40">
+            <Folder size={20} className="text-text-secondary" />
+          </div>
+          <p className="text-[10px] text-text-secondary font-bold uppercase tracking-widest">No active repository</p>
         </div>
       </ComicPanel>
     );
@@ -129,14 +124,12 @@ export function TreeView({ filter = "all", highlightImportant = true, title = "F
 
   const tree = buildFileTree(repoData.files);
 
-  // We skip filtering for now as it needs deeper analysis, or we could implement basic string matching
-  // const filtered = filterTree(tree, filter); 
-
   return (
-    <ComicPanel title={title} color="#1565c0">
-      <div className="max-h-[500px] overflow-y-auto">
+    <ComicPanel title={title}>
+      <div className="max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
         <TreeNode node={tree} depth={0} highlightImportant={highlightImportant} />
       </div>
     </ComicPanel>
   );
 }
+

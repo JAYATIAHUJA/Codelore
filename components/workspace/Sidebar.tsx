@@ -19,28 +19,34 @@ export function Sidebar() {
   }, [repoData]);
 
   return (
-    <aside className="w-72 border-r-2 border-brutal-black bg-white flex flex-col h-[calc(100vh-3.5rem)] sticky top-14">
+    <aside className="w-72 border-r arch-border bg-surface flex flex-col h-[calc(100vh-4rem)] sticky top-16">
       {/* Repository Status */}
       <RepoStatus />
       
       {/* Tab Switcher */}
-      <div className="flex border-b-2 border-brutal-black">
+      <div className="flex border-b arch-border">
         {(["FILES", "INSIGHTS", "DOCS"] as Tab[]).map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`flex-1 py-3 text-[10px] font-bold tracking-widest transition-all ${
+            className={`flex-1 py-3 text-[10px] font-bold tracking-widest transition-all relative ${
               activeTab === tab 
-              ? "bg-brutal-black text-white" 
-              : "bg-white text-zinc-500 hover:text-brutal-black"
+              ? "text-text-primary" 
+              : "text-text-secondary hover:text-text-primary"
             }`}
           >
             {tab}
+            {activeTab === tab && (
+              <motion.div 
+                layoutId="activeTabSide"
+                className="absolute bottom-0 left-0 right-0 h-[2px] bg-accent"
+              />
+            )}
           </button>
         ))}
       </div>
 
-      <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
+      <div className="flex-1 overflow-y-auto p-4 custom-scrollbar bg-background/30">
         <AnimatePresence mode="wait">
           {activeTab === "FILES" && (
             <motion.div
@@ -52,22 +58,22 @@ export function Sidebar() {
               <div className="space-y-1">
                 {isRepoLoading ? (
                   <div className="py-10 flex flex-col items-center justify-center space-y-3 opacity-50">
-                    <Activity className="animate-spin text-brutal-blue" size={24} />
-                    <span className="text-[10px] font-bold uppercase tracking-widest">Parsing Tree...</span>
+                    <Activity className="animate-spin text-accent" size={24} />
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-text-secondary">Parsing Architecture...</span>
                   </div>
                 ) : fileTree.length > 0 ? (
                   <div className="pb-4">
-                    <div className="flex items-center gap-2 px-2 py-1 mb-2 bg-zinc-50 border border-zinc-200">
-                       <GitBranch size={12} className="text-zinc-400" />
-                       <span className="text-[10px] font-mono font-bold text-zinc-500">{repoData?.repo.branch || "main"}</span>
+                    <div className="flex items-center gap-2 px-3 py-1.5 mb-2 bg-surface border arch-border rounded-sm">
+                       <GitBranch size={12} className="text-text-secondary" />
+                       <span className="text-[10px] font-mono font-bold text-text-primary uppercase tracking-tighter">{repoData?.repo.branch || "main"}</span>
                     </div>
                     <RecursiveTree nodes={fileTree} level={0} />
                   </div>
                 ) : (
-                  <div className="py-10 text-center space-y-2 opacity-50 px-4">
-                    <Terminal size={24} className="mx-auto text-zinc-300" />
-                    <p className="text-[10px] font-bold uppercase leading-tight">No Repository Connected</p>
-                    <p className="text-[9px] font-medium lowercase">Connect a public GitHub repo to start navigating.</p>
+                  <div className="py-10 text-center space-y-3 opacity-50 px-4">
+                    <Terminal size={24} className="mx-auto text-text-secondary" />
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-text-primary">No Active Source</p>
+                    <p className="text-[9px] font-medium leading-relaxed text-text-secondary">Connect a GitHub repository to visualize its file structure.</p>
                   </div>
                 )}
               </div>
@@ -81,19 +87,25 @@ export function Sidebar() {
               exit={{ opacity: 0, x: -10 }}
               className="space-y-6"
             >
-              <InsightGroup title="Detected Modules" icon={<Layers size={14} />}>
+              <InsightGroup title="Detected Modules" icon={<Layers size={14} className="text-accent" fill="#000000" />}>
                 <div className="space-y-2 pt-2">
-                   <div className="p-2 border border-black bg-emerald-50 text-[10px] font-bold shadow-[2px_2px_0px_black]">AUTHENTICATION ENGINE</div>
-                   <div className="p-2 border border-black bg-blue-50 text-[10px] font-bold shadow-[2px_2px_0px_black]">PAYMENT_SERVICE (STRIPE)</div>
+                   <div className="p-3 border arch-border bg-surface text-[10px] font-bold text-text-primary tracking-widest uppercase rounded-sm arch-shadow">Authentication Engine</div>
+                   <div className="p-3 border arch-border bg-surface text-[10px] font-bold text-text-primary tracking-widest uppercase rounded-sm arch-shadow">Payment_Service</div>
                 </div>
               </InsightGroup>
               
-              <InsightGroup title="Dependency Clusters" icon={<Activity size={14} />}>
-                 <div className="pt-2">
-                    <div className="h-2 w-full bg-zinc-100 border border-zinc-200 rounded-full overflow-hidden">
-                       <div className="h-full bg-brutal-blue w-[70%]" />
+              <InsightGroup title="Coupling Metrics" icon={<Activity size={14} className="text-accent" fill="#000000" />}>
+                 <div className="pt-2 space-y-3">
+                    <div className="space-y-1">
+                      <div className="flex justify-between text-[8px] font-bold text-text-secondary uppercase">
+                        <span>Module Density</span>
+                        <span>70%</span>
+                      </div>
+                      <div className="h-1.5 w-full bg-text-primary/5 border arch-border rounded-full overflow-hidden">
+                         <div className="h-full bg-accent w-[70%]" />
+                      </div>
                     </div>
-                    <span className="text-[9px] font-bold text-zinc-400 mt-1 block uppercase">High Coupling: Auth -&gt; DB</span>
+                    <span className="text-[9px] font-medium text-text-secondary mt-1 block leading-tight">High coupling detected between Auth and Database entities.</span>
                  </div>
               </InsightGroup>
             </motion.div>
@@ -106,28 +118,33 @@ export function Sidebar() {
               exit={{ opacity: 0, x: -10 }}
               className="space-y-4"
             >
-              <div className="bg-zinc-50 border-2 border-black p-4 brutal-shadow-sm">
-                 <h4 className="font-[var(--font-bangers)] text-lg mb-2">README.md</h4>
-                 <div className="h-2 w-32 bg-zinc-300 mb-1" />
-                 <div className="h-2 w-24 bg-zinc-200 mb-4" />
-                 <p className="text-[10px] font-mono text-zinc-500 leading-relaxed uppercase">
-                   Repository parsed successfully. 
-                   Key entry points identified: 
-                   - index.tsx
-                   - server.ts
-                 </p>
+              <div className="bg-surface border arch-border p-5 rounded-sm arch-shadow">
+                 <h4 className="text-sm font-bold text-text-primary mb-3 uppercase tracking-widest">Repository Context</h4>
+                 <div className="space-y-4">
+                   <div className="space-y-1.5">
+                     <div className="h-1.5 w-3/4 bg-text-primary/10 rounded-full" />
+                     <div className="h-1.5 w-1/2 bg-text-primary/10 rounded-full" />
+                   </div>
+                   <p className="text-[10px] font-mono text-text-secondary leading-relaxed uppercase">
+                     Key entry points identified: 
+                     <br />
+                     <span className="text-accent">→ interface/page.tsx</span>
+                     <br />
+                     <span className="text-accent">→ api/github/route.ts</span>
+                   </p>
+                 </div>
               </div>
             </motion.div>
           )}
         </AnimatePresence>
       </div>
 
-      <div className="p-4 border-t-2 border-brutal-black bg-zinc-50">
+      <div className="p-4 border-t arch-border bg-surface">
          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-brutal-blue border-2 border-black flex items-center justify-center text-white text-[10px] font-bold">VN</div>
+            <div className="w-9 h-9 rounded-sm bg-accent flex items-center justify-center text-white text-[10px] font-bold arch-shadow">VN</div>
             <div className="flex flex-col">
-               <span className="text-[10px] font-bold leading-none">Vansh Nagpal</span>
-               <span className="text-[9px] text-zinc-400 font-mono">Pro Builder</span>
+               <span className="text-xs font-bold text-text-primary leading-none">Vansh Nagpal</span>
+               <span className="text-[10px] text-text-secondary font-mono tracking-widest uppercase mt-0.5">Frontend Architect</span>
             </div>
          </div>
       </div>
@@ -156,7 +173,7 @@ function TreeItem({ node, level }: { node: TreeNode; level: number }) {
         label={node.name}
         isFolder={node.type === "directory"}
         isOpened={isOpened}
-        icon={node.type === "directory" ? <Folder size={14} className={isOpened ? "fill-zinc-200" : ""} /> : <FileCode size={14} />}
+        icon={node.type === "directory" ? <Folder size={14} className={isOpened ? "fill-text-secondary/20" : ""} /> : <FileCode size={14} />}
         onClick={() => node.type === "directory" && setIsOpened(!isOpened)}
       />
       {isOpened && node.children && (
@@ -187,14 +204,14 @@ function FileItem({
     <div 
       style={{ paddingLeft: `${level * 12 + 8}px` }}
       onClick={onClick}
-      className={`group flex items-center gap-2 py-1 px-2 cursor-pointer hover:bg-zinc-50 transition-colors ${isImportant ? "text-brutal-blue" : "text-zinc-600"} active:bg-zinc-100`}
+      className={`group flex items-center gap-2 py-1 px-2 cursor-pointer hover:bg-text-primary/5 transition-all duration-200 ${isImportant ? "text-accent" : "text-text-secondary"} active:bg-text-primary/10 rounded-sm mb-0.5`}
     >
       <div className="flex items-center justify-center w-4">
-        {isFolder && <ChevronRight size={10} className={`transition-transform duration-200 ${isOpened ? "rotate-90" : ""}`} />}
+        {isFolder && <ChevronRight size={10} className={`transition-transform duration-200 text-text-secondary/40 ${isOpened ? "rotate-90 text-accent" : ""}`} />}
       </div>
-      <span className="text-zinc-400 group-hover:text-brutal-black transition-colors">{icon}</span>
-      <span className={`text-[11px] font-mono truncate ${isImportant ? "font-bold" : "font-medium"}`}>{label}</span>
-      {isImportant && <Star size={10} fill="currentColor" className="ml-auto flex-shrink-0" />}
+      <span className="text-text-secondary/60 group-hover:text-text-primary transition-colors">{icon}</span>
+      <span className={`text-[11px] font-mono truncate tracking-tight ${isImportant ? "font-bold text-text-primary" : "font-medium"}`}>{label}</span>
+      {isImportant && <Star size={10} fill="currentColor" className="ml-auto text-accent" />}
     </div>
   );
 }
