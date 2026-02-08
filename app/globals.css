@@ -7,12 +7,12 @@
   --text-primary: #0F172A;
   --text-secondary: #475569;
   --border: #E2E8F0;
-  --accent: #7fffc3;
-  --accent-hover: #5ee9b0;
+  --accent: #10b981;
+  --accent-hover: #059669;
   --muted: #94A3B8;
   --card-bg: #FFFFFF;
   --navbar-bg: rgba(248, 249, 251, 0.8);
-  --selection: rgba(127, 255, 195, 0.3);
+  --selection: rgba(16, 185, 129, 0.15);
 }
 
 .dark {
@@ -78,7 +78,7 @@ body {
   background-color: var(--accent);
   color: white;
   padding: 0.625rem 1.25rem;
-  font-weight: 500;
+  font-weight: 600;
   font-size: 0.875rem;
   transition: all 0.2s ease;
   border-radius: 4px;
@@ -87,6 +87,7 @@ body {
 .arch-btn-primary:hover {
   background-color: var(--accent-hover);
   transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
 }
 
 .arch-btn-secondary {
@@ -107,8 +108,9 @@ body {
 
 /* New Brand Buttons (Pill/Modern) */
 .brand-btn-primary {
-  @apply relative inline-flex items-center gap-4 bg-[#000000] text-[#7fffc3] rounded-2xl overflow-hidden transition-all duration-500;
+  @apply relative inline-flex items-center gap-4 bg-[#000000] rounded-2xl overflow-hidden transition-all duration-500;
   padding: 0.5rem 0.5rem 0.5rem 1.875rem;
+  color: var(--accent);
   box-shadow: 0 0 0px rgba(127, 255, 195, 0);
   font-family: var(--font-mono);
 }
@@ -122,7 +124,7 @@ body {
 
 .brand-btn-primary:hover {
   @apply scale-[1.02];
-  box-shadow: 0 0 30px rgba(127, 255, 195, 0.25);
+  box-shadow: 0 0 30px rgba(16, 185, 129, 0.25);
 }
 
 .brand-btn-primary:hover::before {
@@ -130,7 +132,8 @@ body {
 }
 
 .brand-btn-icon {
-  @apply relative z-10 w-10 h-10 bg-[#7fffc3] text-[#000000] rounded-xl flex items-center justify-center transition-transform duration-300;
+  @apply relative z-10 w-10 h-10 text-[#000000] rounded-xl flex items-center justify-center transition-transform duration-300;
+  background-color: var(--accent);
   box-shadow: inset 0 0 8px rgba(255, 255, 255, 0.5);
 }
 
@@ -143,12 +146,12 @@ body {
 }
 
 .brutal-btn-cyan:hover {
-  background-color: #79F7FF;
+  background-color: var(--accent-hover);
   box-shadow: 2px 2px 0px rgba(0,0,0,1);
 }
 
 .brutal-btn-cyan:active {
-  background-color: #00E1EF;
+  background-color: var(--accent);
 }
 
 .brutal-btn-pink-square {
@@ -443,10 +446,9 @@ body {
 
 /* Button Expansion Effect */
 .btn-expand {
-  --color: #7fffc3;
   @apply relative inline-block px-8 py-3 overflow-hidden cursor-pointer font-mono font-bold uppercase tracking-widest text-[11px] rounded-sm transition-all duration-300 z-10;
-  color: var(--color);
-  border: 1px solid var(--color);
+  color: var(--accent);
+  border: 1px solid var(--accent);
   background: transparent;
 }
 
@@ -457,14 +459,14 @@ body {
   left: 100%;
   width: 200%;
   height: 200%;
-  background: var(--color);
+  background: var(--accent);
   border-radius: 50%;
   z-index: -1;
   transition: 0.5s all cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .btn-expand:hover {
-  color: #000000;
+  color: white;
 }
 
 .btn-expand:hover::before {

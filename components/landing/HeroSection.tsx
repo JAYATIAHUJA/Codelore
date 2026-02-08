@@ -3,7 +3,6 @@
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
-import { SnippetCard } from "@/components/ui/SnippetCard";
 
 export function HeroSection() {
   return (
@@ -114,17 +113,6 @@ export function HeroSection() {
               </div>
             </div>
           </div>
-        </motion.div>
-
-        {/* NPM Snippet Section */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.4 }}
-          className="mt-12"
-        >
-          <SnippetCard />
         </motion.div>
       </div>
     </section>

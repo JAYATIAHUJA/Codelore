@@ -23,9 +23,9 @@ export function RepoStatus() {
             </span>
           </div>
           
-          <div className="flex items-center gap-3 text-[10px] text-text-secondary font-mono uppercase tracking-tighter">
+          <div className="flex items-center gap-3 text-[10px] text-zinc-600 dark:text-text-secondary font-mono uppercase tracking-tighter">
             <div className="flex items-center gap-1">
-              <Star size={10} className="text-accent" fill="#000000" />
+              <Star size={10} className="text-accent" fill="currentColor" />
               <span>{repo.stars}</span>
             </div>
             <div className="flex items-center gap-1">
@@ -53,7 +53,7 @@ export function RepoStatus() {
       </div>
 
       {repo.description && (
-        <p className="text-xs text-zinc-600 mt-2 line-clamp-1">
+        <p className="text-xs text-zinc-600 dark:text-text-secondary mt-2 line-clamp-1">
           {repo.description}
         </p>
       )}
@@ -63,7 +63,7 @@ export function RepoStatus() {
           {stats.languages.slice(0, 3).map((lang) => (
             <span
               key={lang}
-              className="px-2 py-0.5 bg-zinc-100 border border-zinc-300 rounded text-xs font-mono"
+              className="px-2 py-0.5 bg-zinc-200 dark:bg-zinc-100 border border-zinc-400 dark:border-zinc-300 rounded text-xs font-mono text-zinc-800 dark:text-zinc-900"
             >
               {lang}
             </span>

@@ -87,14 +87,14 @@ export function Sidebar() {
               exit={{ opacity: 0, x: -10 }}
               className="space-y-6"
             >
-              <InsightGroup title="Detected Modules" icon={<Layers size={14} className="text-accent" fill="#000000" />}>
+              <InsightGroup title="Detected Modules" icon={<Layers size={14} className="text-accent" fill="currentColor" />}>
                 <div className="space-y-2 pt-2">
                    <div className="p-3 border arch-border bg-surface text-[10px] font-bold text-text-primary tracking-widest uppercase rounded-sm arch-shadow">Authentication Engine</div>
                    <div className="p-3 border arch-border bg-surface text-[10px] font-bold text-text-primary tracking-widest uppercase rounded-sm arch-shadow">Payment_Service</div>
                 </div>
               </InsightGroup>
               
-              <InsightGroup title="Coupling Metrics" icon={<Activity size={14} className="text-accent" fill="#000000" />}>
+              <InsightGroup title="Coupling Metrics" icon={<Activity size={14} className="text-accent" fill="currentColor" />}>
                  <div className="pt-2 space-y-3">
                     <div className="space-y-1">
                       <div className="flex justify-between text-[8px] font-bold text-text-secondary uppercase">
@@ -141,7 +141,7 @@ export function Sidebar() {
 
       <div className="p-4 border-t arch-border bg-surface">
          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-sm bg-accent flex items-center justify-center text-white text-[10px] font-bold arch-shadow">VN</div>
+            <div className="w-9 h-9 rounded-sm bg-accent flex items-center justify-center text-white dark:text-black text-[10px] font-bold arch-shadow">VN</div>
             <div className="flex flex-col">
                <span className="text-xs font-bold text-text-primary leading-none">Vansh Nagpal</span>
                <span className="text-[10px] text-text-secondary font-mono tracking-widest uppercase mt-0.5">Frontend Architect</span>

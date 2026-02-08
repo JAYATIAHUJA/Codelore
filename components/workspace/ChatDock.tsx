@@ -103,8 +103,8 @@ RULES:
           </button>
         </div>
 
-        <div className="flex items-center gap-2 p-2 bg-accent/5 border border-accent/20 rounded-sm text-accent">
-          <Target size={14} fill="#000000" />
+        <div className="flex items-center gap-2 p-2 bg-accent/10 dark:bg-accent/5 border border-accent/30 dark:border-accent/20 rounded-sm text-accent">
+          <Target size={14} fill="currentColor" />
           <span className="text-[10px] font-bold uppercase tracking-widest">
             Context: System Topology
           </span>
@@ -119,7 +119,7 @@ RULES:
         {messages.length === 0 && (
           <div className="text-center py-10 space-y-4">
             <div className="w-12 h-12 bg-surface rounded-sm flex items-center justify-center mx-auto arch-border arch-shadow">
-              <Zap size={20} className="text-accent" fill="#000000" />
+              <Zap size={20} className="text-accent" fill="currentColor" />
             </div>
             <div className="space-y-1">
               <h3 className="text-xs font-bold uppercase tracking-widest text-text-primary">
@@ -177,7 +177,7 @@ function SuggestionButton({ text, onClick }: { text: string; onClick: () => void
   return (
     <button
       onClick={onClick}
-      className="text-left p-2.5 border arch-border bg-background hover:border-accent/40 rounded-sm hover:bg-surface transition-all text-[10px] font-bold uppercase tracking-widest text-text-secondary hover:text-accent arch-shadow-sm"
+      className="text-left p-2.5 border arch-border bg-background hover:border-accent/50 dark:hover:border-accent/40 rounded-sm hover:bg-surface transition-all text-[10px] font-bold uppercase tracking-widest text-text-secondary hover:text-accent arch-shadow-sm"
     >
       {text}
     </button>

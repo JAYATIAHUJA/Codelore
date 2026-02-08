@@ -22,7 +22,7 @@ export function Navbar() {
         {/* Center: Brand */}
         <Link href="/" className="absolute left-1/2 -translate-x-1/2 flex items-center gap-2 group">
           <div className="w-6 h-6 bg-accent rounded-sm flex items-center justify-center -rotate-6 group-hover:rotate-0 transition-transform duration-300">
-             <div className="w-2.5 h-2.5 bg-[#000000] rounded-full" />
+             <div className="w-2.5 h-2.5 bg-white dark:bg-[#000000] rounded-full" />
           </div>
           <span className="text-xl font-bold tracking-tighter text-text-primary uppercase group-hover:tracking-normal transition-all duration-300">CodeLore</span>
         </Link>

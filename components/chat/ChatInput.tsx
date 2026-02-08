@@ -32,7 +32,7 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
         onChange={(e) => setValue(e.target.value)}
         disabled={disabled}
         placeholder='Inquire about architecture...'
-        className="flex-1 border arch-border rounded-sm px-4 py-3 text-xs font-medium bg-background text-text-primary placeholder:text-text-secondary/50 focus:outline-none focus:border-accent/40 disabled:opacity-50 transition-all arch-shadow-sm"
+        className="flex-1 border arch-border rounded-sm px-4 py-3 text-xs font-medium bg-background text-text-primary placeholder:text-text-secondary/50 focus:outline-none focus:border-accent/60 dark:focus:border-accent/40 disabled:opacity-50 transition-all arch-shadow-sm"
       />
       <button
         type="submit"

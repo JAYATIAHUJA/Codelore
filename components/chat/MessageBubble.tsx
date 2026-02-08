@@ -19,10 +19,10 @@ export function MessageBubble({ role, content }: MessageBubbleProps) {
         {label}
       </span>
       <div 
-        className={`max-w-[90%] p-3.5 rounded-sm border arch-border ${
+        className={`max-w-[90%] p-3.5 rounded-sm border ${
           isUser 
-          ? "bg-accent text-white arch-shadow" 
-          : "bg-background text-text-primary arch-shadow-sm"
+          ? "bg-accent text-white dark:text-black border-accent dark:border-accent/50 arch-shadow" 
+          : "bg-surface text-text-primary arch-border arch-shadow-sm"
         }`}
       >
         <div className="text-xs leading-relaxed font-medium">
