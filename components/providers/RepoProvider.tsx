@@ -26,6 +26,7 @@ export interface RepoData {
     stars: number;
     url: string;
     language: string;
+    readme?: string;
   };
   files: RepoFile[];
   modules: Module[];

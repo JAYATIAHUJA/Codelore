@@ -81,6 +81,7 @@ export async function POST(req: NextRequest) {
       fetch(`https://api.github.com/repos/${owner}/${repoName}/contents/pom.xml?ref=${branch}`, { headers }),
       fetch(`https://api.github.com/repos/${owner}/${repoName}/contents/Cargo.toml?ref=${branch}`, { headers }),
       fetch(`https://api.github.com/repos/${owner}/${repoName}/contents/go.mod?ref=${branch}`, { headers }),
+      fetch(`https://api.github.com/repos/${owner}/${repoName}/readme`, { headers }), // Fetch README content (auto-rendered by GitHub API)
     ]);
 
     // 4. Transform files
@@ -102,6 +103,14 @@ export async function POST(req: NextRequest) {
         stars: repoData.stargazers_count,
         url: repoData.html_url,
         language: repoData.language,
+        readme: (configFiles[5].status === "fulfilled" && (configFiles[5] as PromiseFulfilledResult<Response>).value.ok)
+          ? await (async () => {
+            const res = configFiles[5] as PromiseFulfilledResult<Response>;
+            const data = await res.value.json();
+            // GitHub API returns README content in base64
+            return data.content ? Buffer.from(data.content, 'base64').toString('utf-8') : null;
+          })()
+          : null,
       },
       files,
       modules,
