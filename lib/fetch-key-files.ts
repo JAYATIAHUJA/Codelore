@@ -1,3 +1,5 @@
+import { buildGitHubHeaders, getGitHubToken } from "@/lib/auth";
+
 const KEY_FILES = [
   "package.json",
   "Cargo.toml",
@@ -43,6 +45,8 @@ export async function fetchKeyFiles(
   );
 
   const results: KeyFileContent[] = [];
+  const token = await getGitHubToken();
+  const headers = buildGitHubHeaders(token);
 
   // Fetch up to 5 key files to avoid rate limiting
   for (const filePath of filesToFetch.slice(0, 5)) {
@@ -53,12 +57,7 @@ export async function fetchKeyFiles(
 
       const response = await fetch(
         `https://api.github.com/repos/${owner}/${repo}/contents/${matchedPath}`,
-        {
-          headers: {
-            Accept: "application/vnd.github.v3+json",
-            "User-Agent": "codebase-app",
-          },
-        }
+        { headers }
       );
 
       if (!response.ok) continue;

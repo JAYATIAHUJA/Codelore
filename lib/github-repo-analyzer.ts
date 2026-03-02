@@ -1,3 +1,5 @@
+import { buildGitHubHeaders, getGitHubToken } from "@/lib/auth";
+
 export interface RepoFile {
   path: string;
   type: "blob" | "tree";
@@ -19,17 +21,15 @@ export async function fetchRepoStructure(
   owner: string,
   repo: string
 ): Promise<RepoStructure | null> {
+  const token = await getGitHubToken();
+  const headers = buildGitHubHeaders(token);
+
   // Try main, then master
   for (const branch of ["main", "master", "develop"]) {
     try {
       const res = await fetch(
         `https://api.github.com/repos/${owner}/${repo}/git/trees/${branch}?recursive=1`,
-        {
-          headers: {
-            Accept: "application/vnd.github.v3+json",
-            "User-Agent": "codebase-app",
-          },
-        }
+        { headers }
       );
       if (!res.ok) continue;
       const data = await res.json();
@@ -152,14 +152,12 @@ export async function fetchKeyFileContent(
   filePath: string
 ): Promise<string | null> {
   try {
+    const token = await getGitHubToken();
+    const headers = buildGitHubHeaders(token);
+
     const res = await fetch(
       `https://api.github.com/repos/${owner}/${repo}/contents/${filePath}`,
-      {
-        headers: {
-          Accept: "application/vnd.github.v3+json",
-          "User-Agent": "codebase-app",
-        },
-      }
+      { headers }
     );
     if (!res.ok) return null;
     const data = await res.json();

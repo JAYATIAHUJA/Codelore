@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getGitHubToken, buildGitHubHeaders } from "@/lib/auth";
 
 interface GitHubFile {
   path: string;
@@ -32,14 +33,8 @@ export async function POST(req: NextRequest) {
     const owner = match[1];
     let repoName = match[2].replace(/\.git$/, "").replace(/\/$/, "");
 
-    const headers: HeadersInit = {
-      "Accept": "application/vnd.github.v3+json",
-      "User-Agent": "CodeLore-App",
-    };
-
-    if (process.env.GITHUB_TOKEN) {
-      headers["Authorization"] = `token ${process.env.GITHUB_TOKEN}`;
-    }
+    const token = await getGitHubToken();
+    const headers = buildGitHubHeaders(token);
 
     // 1. Fetch repository metadata
     const repoResponse = await fetch(`https://api.github.com/repos/${owner}/${repoName}`, {

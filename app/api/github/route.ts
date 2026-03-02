@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getGitHubToken, buildGitHubHeaders } from "@/lib/auth";
 
 export async function POST(req: NextRequest) {
   try {
@@ -19,15 +20,8 @@ export async function POST(req: NextRequest) {
     // Remove trailing .git or trailing slash
     repoName = repoName.replace(/\.git$/, "").replace(/\/$/, "");
 
-    const headers: HeadersInit = {
-      "Accept": "application/vnd.github.v3+json",
-      "User-Agent": "CodeLore-App",
-    };
-
-    // Use GITHUB_TOKEN if available to increase rate limits
-    if (process.env.GITHUB_TOKEN) {
-      headers["Authorization"] = `token ${process.env.GITHUB_TOKEN}`;
-    }
+    const token = await getGitHubToken();
+    const headers = buildGitHubHeaders(token);
 
     // 1. Fetch Repository Metadata (to get default branch and verify existence)
     const repoResponse = await fetch(`https://api.github.com/repos/${owner}/${repoName}`, {
