@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 
 const TECH_BADGES = [
-  { name: "Built with Tambo", color: "bg-background" },
+  { name: "Gemini AI", color: "bg-background" },
   { name: "React 19", color: "bg-background" },
   { name: "Next.js 15", color: "bg-background" },
   { name: "GitHub API", color: "bg-background" },
@@ -19,7 +19,7 @@ export function AllianceSection() {
           <span className="text-[10px] font-bold tracking-[0.3em] uppercase text-accent">Tech Stack</span>
           <h2 className="text-2xl font-bold tracking-tight text-text-primary">Built on the Modern Web.</h2>
         </div>
-        
+
         <div className="flex flex-wrap justify-center gap-4 max-w-3xl mx-auto">
           {TECH_BADGES.map((tech) => (
             <motion.div

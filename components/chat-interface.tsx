@@ -4,74 +4,33 @@ import type React from "react";
 import { useState, useRef, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useTamboThread, useTamboThreadInput } from "@tambo-ai/react";
+import { useChat } from "@/hooks/useChat";
 import { Send, Bot, User } from "lucide-react";
 
 interface ChatInterfaceProps {
   threadId?: string;
 }
 
-interface ChatMessage {
-  role: "user" | "assistant";
-  content: string;
-}
-
+/**
+ * Legacy standalone chat interface component.
+ * The workspace now uses ChatDock + useChat hook.
+ * Kept for reference but no longer actively used.
+ */
 export default function ChatInterface({ threadId }: ChatInterfaceProps) {
   const [question, setQuestion] = useState("");
-  const [isAsking, setIsAsking] = useState(false);
-  const [localMessages, setLocalMessages] = useState<ChatMessage[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const thread = useTamboThread();
-  const { setValue: setInput, submit } = useTamboThreadInput();
-
-  const threadMessages = thread?.thread?.messages || [];
-  const hasGraph = threadMessages.length >= 2;
-
-  // Sync assistant responses from thread into local messages
-  useEffect(() => {
-    if (threadMessages.length <= 2) return; // Skip initial graph pair
-
-    const latestMsg = threadMessages[threadMessages.length - 1];
-    if (latestMsg && latestMsg.role === "assistant") {
-      const content = typeof latestMsg.content === "string" ? latestMsg.content : "";
-      if (content && !localMessages.some((m) => m.content === content && m.role === "assistant")) {
-        setLocalMessages((prev) => [...prev, { role: "assistant", content }]);
-      }
-    }
-  }, [threadMessages.length]);
+  const { messages, isLoading, sendMessage } = useChat();
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [localMessages.length]);
+  }, [messages.length]);
 
   const handleAsk = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!question.trim() || !hasGraph) return;
-
-    const userQ = question.trim();
-    setLocalMessages((prev) => [...prev, { role: "user", content: userQ }]);
+    if (!question.trim()) return;
+    await sendMessage(question.trim());
     setQuestion("");
-    setIsAsking(true);
-
-    try {
-      const prompt = `The user is asking a follow-up question about the repository that was just analyzed. Use the file structure, architecture, and all context from the previous analysis to answer thoroughly.
-
-Do NOT generate a new graph. Just answer the question conversationally with specific references to files, directories, and architecture.
-
-User's question: ${userQ}`;
-
-      setInput(prompt);
-      await submit();
-    } catch (error) {
-      console.error("Chat error:", error);
-      setLocalMessages((prev) => [
-        ...prev,
-        { role: "assistant", content: "Sorry, I encountered an error. Please try again." },
-      ]);
-    } finally {
-      setIsAsking(false);
-    }
   };
 
   return (
@@ -82,7 +41,7 @@ User's question: ${userQ}`;
       </div>
 
       <div className="flex-1 overflow-y-auto p-4 space-y-3 min-h-[200px] max-h-[400px]">
-        {localMessages.length === 0 ? (
+        {messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-muted-foreground text-sm gap-2">
             <Bot className="h-8 w-8 opacity-50" />
             <p>Ask anything about this repository!</p>
@@ -93,9 +52,9 @@ User's question: ${userQ}`;
             </div>
           </div>
         ) : (
-          localMessages.map((msg, i) => (
+          messages.map((msg) => (
             <div
-              key={i}
+              key={msg.id}
               className={`flex gap-2 ${msg.role === "user" ? "justify-end" : "justify-start"}`}
             >
               {msg.role === "assistant" && (
@@ -105,8 +64,8 @@ User's question: ${userQ}`;
               )}
               <div
                 className={`max-w-[80%] rounded-lg px-3 py-2 text-sm ${msg.role === "user"
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-muted"
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-muted"
                   }`}
               >
                 <p className="whitespace-pre-wrap">{msg.content}</p>
@@ -119,7 +78,7 @@ User's question: ${userQ}`;
             </div>
           ))
         )}
-        {isAsking && (
+        {isLoading && (
           <div className="flex gap-2 justify-start">
             <div className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center mt-1">
               <Bot className="h-3 w-3" />
@@ -136,16 +95,16 @@ User's question: ${userQ}`;
         <div className="flex gap-2">
           <Input
             type="text"
-            placeholder={hasGraph ? "Ask about the repo..." : "Generate a graph first"}
+            placeholder="Ask about the repo..."
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
-            disabled={isAsking || !hasGraph}
+            disabled={isLoading}
             className="flex-1 text-sm"
           />
           <Button
             type="submit"
             size="sm"
-            disabled={isAsking || !question.trim() || !hasGraph}
+            disabled={isLoading || !question.trim()}
           >
             <Send className="h-4 w-4" />
           </Button>
