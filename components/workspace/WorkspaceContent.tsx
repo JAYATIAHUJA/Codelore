@@ -1,6 +1,5 @@
 "use client";
 
-import { TamboThreadProvider } from "@tambo-ai/react";
 import React from "react";
 import { ChatDock } from "./ChatDock";
 import { InfiniteCanvas } from "./InfiniteCanvas";
@@ -11,22 +10,19 @@ interface WorkspaceContentProps {
 }
 
 /**
- * Wraps each workspace tab's content in its own TamboThreadProvider,
- * giving each tab an isolated AI chat thread and canvas.
+ * Wraps each workspace tab's content with the canvas and chat dock.
  * The `key` prop on this component (set to tabId) ensures full
- * remount when switching tabs → fresh thread per workspace.
+ * remount when switching tabs → fresh state per workspace.
  */
 export function WorkspaceContent({ tabId, children }: WorkspaceContentProps) {
   return (
-    <TamboThreadProvider contextKey={`workspace-${tabId}`} streaming>
-      <div className="flex flex-1 overflow-hidden relative">
-        <div className="flex-1 relative overflow-hidden flex flex-col">
-          <InfiniteCanvas>
-            {children}
-          </InfiniteCanvas>
-        </div>
-        <ChatDock />
+    <div className="flex flex-1 overflow-hidden relative">
+      <div className="flex-1 relative overflow-hidden flex flex-col">
+        <InfiniteCanvas>
+          {children}
+        </InfiniteCanvas>
       </div>
-    </TamboThreadProvider>
+      <ChatDock />
+    </div>
   );
 }

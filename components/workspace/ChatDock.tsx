@@ -4,61 +4,52 @@ import { ChatInput } from "@/components/chat/ChatInput";
 import { LoadingDots } from "@/components/chat/LoadingDots";
 import { MessageBubble } from "@/components/chat/MessageBubble";
 import { useRepo } from "@/components/providers/RepoProvider";
-import { useTamboThread } from "@tambo-ai/react";
+import { useChat } from "@/hooks/useChat";
 import { MoreHorizontal, Target, Zap } from "lucide-react";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useRef } from "react";
 
 
 export function ChatDock() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const { repoData } = useRepo();
 
-  const { thread, sendThreadMessage, isIdle } = useTamboThread();
-
-  const messages = useMemo(() => thread?.messages ?? [], [thread?.messages]);
-  const sendMessage = sendThreadMessage;
-  const isLoading = !isIdle;
+  const { messages, isLoading, sendMessage, setRepoContext } = useChat();
 
   const isLocked = !repoData;
 
-  // Inject Repo Context
-  const hasSentContext = useRef(false);
+  // Inject repo context when repo data changes
   const lastRepoUrl = useRef<string | null>(null);
 
   useEffect(() => {
-    // Reset context flag if a different repo is connected
-    if (repoData?.repo?.url !== lastRepoUrl.current) {
-      hasSentContext.current = false;
-      lastRepoUrl.current = repoData?.repo?.url ?? null;
-    }
+    if (!repoData) return;
+    if (repoData.repo?.url === lastRepoUrl.current) return;
+    lastRepoUrl.current = repoData.repo?.url ?? null;
 
-    if (repoData && !hasSentContext.current && !isLoading) {
-      console.log("Injecting repo context to AI...");
-      
-      const moduleSummary = repoData.modules?.length 
-        ? repoData.modules.map(m => 
+    // Build context string for Gemini
+    const moduleSummary = repoData.modules?.length
+      ? repoData.modules
+        .map(
+          (m) =>
             `- ${m.name} (${m.type}): ${m.description} | Files: ${m.files.slice(0, 5).join(", ")}`
-          ).join("\n")
-        : "No modules detected yet.";
+        )
+        .join("\n")
+      : "No modules detected yet.";
 
-      const langInfo = repoData.stats?.languages?.length
-        ? `Languages: ${[...new Set(repoData.stats.languages)].join(", ")}`
-        : "";
+    const langInfo = repoData.stats?.languages?.length
+      ? `Languages: ${[...new Set(repoData.stats.languages)].join(", ")}`
+      : "";
 
-      const frameworkInfo = repoData.stats?.frameworks?.length
-        ? `Frameworks: ${repoData.stats.frameworks.join(", ")}`
-        : "";
+    const frameworkInfo = repoData.stats?.frameworks?.length
+      ? `Frameworks: ${repoData.stats.frameworks.join(", ")}`
+      : "";
 
-      // Limit file list to avoid Tambo API payload limits
-      const trimmedFileList = repoData.files
-        .filter(f => f.type === "file")
-        .map(f => f.path)
-        .slice(0, 80)
-        .join("\n");
-      const fileCount = repoData.files.filter(f => f.type === "file").length;
-      const truncatedNote = fileCount > 80 ? `\n... and ${fileCount - 80} more files` : "";
+    const trimmedFileList = repoData.files
+      .filter((f) => f.type === "file")
+      .map((f) => f.path)
+      .slice(0, 100)
+      .join("\n");
 
-      const contextMessage = `Repository: ${repoData.repo.owner}/${repoData.repo.name} (${repoData.repo.description || "no description"}).
+    const context = `Repository: ${repoData.repo.owner}/${repoData.repo.name} (${repoData.repo.description || "no description"}).
 ${langInfo} ${frameworkInfo}
 Files: ${repoData.stats.totalFiles}, Folders: ${repoData.stats.totalFolders}
 
@@ -66,19 +57,12 @@ Modules:
 ${moduleSummary}
 
 Key files:
-${trimmedFileList}${truncatedNote}
+${trimmedFileList}
 
-RULES:
-1. "folder structure" / "file tree" → render TreeView
-2. "architecture" / "modules" / "explain project" → render ModuleCards
-3. ANY flow/lifecycle/trace/sequence/"how does X work" → render CodeFlowGraph with columns containing code blocks. You MUST populate the columns array with objects like {title:"Stage", color:"#FFD600", blocks:[{id:"b1", label:"functionName()", code:"actual code here"}]} and connections like [{from:"b1", to:"b2", label:"calls"}]. NEVER leave columns empty.
-4. "show project graph" / "visualize architecture" / "dependency map" → render ProjectGraph with nodes and edges.
-5. Use real file paths from above. Do NOT generate fake data.`;
+${repoData.repo.readme ? `README:\n${repoData.repo.readme?.slice(0, 3000)}` : ""}`;
 
-      sendMessage(contextMessage);
-      hasSentContext.current = true;
-    }
-  }, [repoData, isLoading, sendMessage]);
+    setRepoContext(context);
+  }, [repoData, setRepoContext]);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({
@@ -135,8 +119,8 @@ RULES:
                 text="Architecture Overview"
               />
               <SuggestionButton
-                onClick={() => sendMessage("Show auth flow")}
-                text="Auth Sequence"
+                onClick={() => sendMessage("Show the project graph")}
+                text="Project Graph"
               />
               <SuggestionButton
                 onClick={() => sendMessage("What are the key files?")}
@@ -148,7 +132,7 @@ RULES:
 
         {messages.map((msg) => (
           <div key={msg.id} className="space-y-1">
-            <MessageBubble role={msg.role} content={Array.isArray(msg.content) ? msg.content.map(part => 'text' in part ? part.text : '').join('') : msg.content} />
+            <MessageBubble role={msg.role} content={msg.content} />
           </div>
         ))}
 
