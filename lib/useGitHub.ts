@@ -33,7 +33,7 @@ export function useGitHubIntegration() {
     setError(null);
 
     try {
-      const response = await fetch('/api/github/analyze', {
+      const response = await fetch('/api/ai/analyze', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

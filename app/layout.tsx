@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { TamboProviderWrapper } from "@/components/providers/TamboProviderWrapper";
 import { RepoProvider } from "@/components/providers/RepoProvider";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { WorkspaceTabsProvider } from "@/components/providers/WorkspaceTabsProvider";
 import { AuthProvider } from "@/components/providers/AuthProvider";
+import { ChatProvider } from "@/hooks/useChat";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -14,7 +14,7 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: "CodeLore | Talk To Your Codebase",
-  description: "CodeLore connects to your GitHub repository and transforms complex architectures into visual, interactive intelligence maps powered by generative UI.",
+  description: "CodeLore connects to your GitHub repository and transforms complex architectures into visual, interactive intelligence maps powered by Gemini AI.",
 };
 
 export default function RootLayout({
@@ -36,7 +36,7 @@ export default function RootLayout({
           <AuthProvider>
             <RepoProvider>
               <WorkspaceTabsProvider>
-                <TamboProviderWrapper>{children}</TamboProviderWrapper>
+                <ChatProvider>{children}</ChatProvider>
               </WorkspaceTabsProvider>
             </RepoProvider>
           </AuthProvider>
